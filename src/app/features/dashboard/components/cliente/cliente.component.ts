@@ -7,6 +7,23 @@ import { MatChipsModule } from '@angular/material/chips';
 import { ClienteService } from '../../services/cliente.service';
 import { Cliente } from '../../interfaces/cliente.interface';
 
+// Interface para el estado del componente (ISP)
+interface ClienteComponentState {
+  cliente: Cliente | null;
+  cargando: boolean;
+  error: boolean;
+  esIdMongoValido: boolean;
+}
+
+// Clase para validación (SRP)
+class ClienteValidator {
+  static validarIdMongo(id: string): boolean {
+    if (!id) return false;
+    const mongoIdRegex = /^[0-9a-fA-F]{24}$/;
+    return mongoIdRegex.test(id);
+  }
+}
+
 @Component({
   selector: 'app-cliente',
   standalone: true,
@@ -26,41 +43,41 @@ import { Cliente } from '../../interfaces/cliente.interface';
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        @if (cargando) {
+        @if (state.cargando) {
           <div class="loading-container">
             <mat-spinner diameter="40"></mat-spinner>
             <p>Cargando datos del cliente...</p>
           </div>
-        } @else if (error) {
+        } @else if (state.error) {
           <div class="error-container">
             <mat-icon color="warn">error</mat-icon>
             <p>Error al cargar los datos del cliente</p>
           </div>
-        } @else if (!esIdMongoValido) {
+        } @else if (!state.esIdMongoValido) {
           <div class="no-data">
             <mat-icon>info</mat-icon>
             <p>No hay datos del cliente</p>
           </div>
-        } @else if (cliente) {
+        } @else if (state.cliente) {
           <div class="cliente-info">
             <div class="info-row">
               <mat-chip-set>
                 <mat-chip color="primary" selected>
                   <mat-icon matChipAvatar>badge</mat-icon>
-                  ID: {{ cliente.id }}
+                  ID: {{ state.cliente.id }}
                 </mat-chip>
               </mat-chip-set>
             </div>
             <div class="info-row">
-              <h3>{{ cliente.nombre }} {{ cliente.apellidos }}</h3>
+              <h3>{{ state.cliente.nombre }} {{ state.cliente.apellidos }}</h3>
             </div>
             <div class="info-row">
               <mat-icon>location_city</mat-icon>
-              <span>{{ cliente.ciudad }}</span>
+              <span>{{ state.cliente.ciudad }}</span>
             </div>
             <div class="info-row monto">
               <mat-icon>attach_money</mat-icon>
-              <span class="monto-value">{{ cliente.monto | currency:'USD':'symbol':'1.2-2' }}</span>
+              <span class="monto-value">{{ state.cliente.monto | currency:'USD':'symbol':'1.2-2' }}</span>
             </div>
           </div>
         } @else {
@@ -146,13 +163,17 @@ import { Cliente } from '../../interfaces/cliente.interface';
 export class ClienteComponent implements OnInit, OnChanges {
   @Input() clienteId: string = '';
   
+  // Inyección de dependencias (DIP)
   private readonly clienteService = inject(ClienteService);
   private readonly cdr = inject(ChangeDetectorRef);
   
-  cliente: Cliente | null = null;
-  cargando = false;
-  error = false;
-  esIdMongoValido = true;
+  // Estado del componente
+  state: ClienteComponentState = {
+    cliente: null,
+    cargando: false,
+    error: false,
+    esIdMongoValido: true
+  };
 
   ngOnInit(): void {
     if (this.clienteId) {
@@ -162,7 +183,6 @@ export class ClienteComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['clienteId']) {
-      // Resetear estados al cambiar el ID
       this.resetearEstados();
       
       if (changes['clienteId'].currentValue) {
@@ -171,54 +191,57 @@ export class ClienteComponent implements OnInit, OnChanges {
     }
   }
 
+  // Método para resetear estados (SRP)
   private resetearEstados(): void {
-    this.cliente = null;
-    this.cargando = false;
-    this.error = false;
-    this.esIdMongoValido = true;
+    this.state = {
+      cliente: null,
+      cargando: false,
+      error: false,
+      esIdMongoValido: true
+    };
     this.cdr.detectChanges();
   }
 
+  // Método para validar y cargar cliente (SRP)
   private validarYCargarCliente(): void {
     if (!this.clienteId) {
-      this.esIdMongoValido = false;
+      this.state.esIdMongoValido = false;
       this.cdr.detectChanges();
       return;
     }
 
-    // Validar formato de ObjectId de MongoDB (24 caracteres hexadecimales)
-    const mongoIdRegex = /^[0-9a-fA-F]{24}$/;
-    this.esIdMongoValido = mongoIdRegex.test(this.clienteId);
+    // Usar la clase de validación (SRP)
+    this.state.esIdMongoValido = ClienteValidator.validarIdMongo(this.clienteId);
 
-    if (this.esIdMongoValido) {
+    if (this.state.esIdMongoValido) {
       this.cargarCliente();
     } else {
-      // Resetear estados si el ID no es válido
-      this.cliente = null;
-      this.cargando = false;
-      this.error = false;
+      this.state.cliente = null;
+      this.state.cargando = false;
+      this.state.error = false;
       this.cdr.detectChanges();
     }
   }
 
+  // Método para cargar datos del cliente (SRP)
   private cargarCliente(): void {
-    this.cargando = true;
-    this.error = false;
-    this.cliente = null;
+    this.state.cargando = true;
+    this.state.error = false;
+    this.state.cliente = null;
     this.cdr.detectChanges();
     
     this.clienteService.obtenerClientePorId(this.clienteId).subscribe({
       next: (cliente) => {
-        this.cliente = cliente;
-        this.cargando = false;
-        this.error = false;
+        this.state.cliente = cliente;
+        this.state.cargando = false;
+        this.state.error = false;
         this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error al obtener cliente:', error);
-        this.cliente = null;
-        this.error = true;
-        this.cargando = false;
+        this.state.cliente = null;
+        this.state.error = true;
+        this.state.cargando = false;
         this.cdr.detectChanges();
       }
     });
