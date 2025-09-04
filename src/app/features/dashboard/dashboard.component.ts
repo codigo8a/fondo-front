@@ -49,6 +49,8 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       flex-direction: column;
       height: calc(100vh - 64px);
       padding: 20px;
+      box-sizing: border-box;
+      width: 100%;
     }
     
     .hola-container {
@@ -59,6 +61,7 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       font-size: 3rem;
       font-weight: bold;
       color: #333;
+      width: 100%;
     }
     
     .components-container {
@@ -66,6 +69,9 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       gap: 20px;
       margin-bottom: 20px;
       flex: 1;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 0;
     }
     
     .component-left,
@@ -73,18 +79,32 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       flex: 1;
       display: flex;
       align-items: flex-start;
+      width: calc(50% - 10px);
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    
+    .component-left app-cliente,
+    .component-right app-inscripciones {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
     
     .button-container {
       display: flex;
       justify-content: center;
       padding: 20px;
+      width: 100%;
+      box-sizing: border-box;
+      flex-shrink: 0;
     }
     
     h1 {
       margin: 0;
       text-align: center;
       word-break: break-all;
+      width: 100%;
     }
   `]
 })

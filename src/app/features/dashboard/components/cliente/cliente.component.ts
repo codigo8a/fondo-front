@@ -95,18 +95,28 @@ class ClienteValidator {
       min-height: 250px;
       display: flex;
       flex-direction: column;
+      box-sizing: border-box;
     }
     
     mat-card-header {
       background-color: #f5f5f5;
       margin: -16px -16px 16px -16px;
       padding: 16px;
+      width: calc(100% + 32px);
+      box-sizing: border-box;
+    }
+    
+    mat-card-content {
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
     }
     
     mat-card-title {
       display: flex;
       align-items: center;
       gap: 8px;
+      width: 100%;
     }
     
     .loading-container,
@@ -118,28 +128,36 @@ class ClienteValidator {
       justify-content: center;
       padding: 20px;
       text-align: center;
+      width: 100%;
+      box-sizing: border-box;
     }
     
     .cliente-info {
       display: flex;
       flex-direction: column;
       gap: 16px;
+      width: 100%;
     }
     
     .info-row {
       display: flex;
       align-items: center;
       gap: 8px;
+      width: 100%;
+      flex-wrap: wrap;
     }
     
     .info-row h3 {
       margin: 0;
       color: #1976d2;
       font-weight: 500;
+      flex: 1;
+      min-width: 0;
     }
     
     .info-row mat-icon {
       color: #666;
+      flex-shrink: 0;
     }
     
     .monto {
@@ -147,6 +165,8 @@ class ClienteValidator {
       padding: 8px;
       border-radius: 4px;
       border-left: 4px solid #4caf50;
+      width: 100%;
+      box-sizing: border-box;
     }
     
     .monto-value {
@@ -157,6 +177,13 @@ class ClienteValidator {
     
     mat-chip-set {
       margin: 0;
+      width: 100%;
+    }
+    
+    mat-chip {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   `]
 })
