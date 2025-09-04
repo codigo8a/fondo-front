@@ -1,10 +1,16 @@
-import { Component, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { Observable } from 'rxjs';
+
+import { IDashboardService } from './interfaces/dashboard-service.interface';
+import { DashboardWidget, WidgetType } from './interfaces/dashboard-widget.interface';
+import { DashboardService } from './services/dashboard.service';
+import { BaseWidgetComponent } from './components/base-widget/base-widget.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,7 +21,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatButtonModule,
     MatIconModule,
     MatGridListModule,
-    MatToolbarModule
+    MatToolbarModule,
+    BaseWidgetComponent
   ],
   template: `
     <mat-toolbar color="primary">
@@ -24,36 +31,34 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     </mat-toolbar>
     
     <div class="dashboard-container">
+      <p>Total widgets: {{ widgets.length }}</p>
       <mat-grid-list cols="2" rowHeight="200px" gutterSize="16px">
-        <mat-grid-tile>
-          <mat-card class="dashboard-card">
-            <mat-card-header>
-              <mat-card-title>Estadísticas</mat-card-title>
-              <mat-card-subtitle>Resumen general</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <p>Contenido de estadísticas aquí</p>
-            </mat-card-content>
-            <mat-card-actions>
-              <button mat-button color="primary">Ver más</button>
-            </mat-card-actions>
-          </mat-card>
-        </mat-grid-tile>
-        
-        <mat-grid-tile>
-          <mat-card class="dashboard-card">
-            <mat-card-header>
-              <mat-card-title>Actividad Reciente</mat-card-title>
-              <mat-card-subtitle>Últimas acciones</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-              <p>Lista de actividades recientes</p>
-            </mat-card-content>
-            <mat-card-actions>
-              <button mat-button color="accent">Ver historial</button>
-            </mat-card-actions>
-          </mat-card>
-        </mat-grid-tile>
+        @for (widget of widgets; track widget.id) {
+          <mat-grid-tile>
+            <p>Widget: {{ widget.title }}</p>
+            <app-base-widget 
+              [widget]="widget"
+              [primaryActionText]="getPrimaryActionText(widget.type)"
+              [secondaryActionText]="getSecondaryActionText(widget.type)"
+              (primaryAction)="handlePrimaryAction(widget)"
+              (secondaryAction)="handleSecondaryAction(widget)">
+              
+              <!-- Contenido específico del widget -->
+              @switch (widget.type) {
+                @case ('statistics') {
+                  <div>
+                    <p>Contenido de estadísticas aquí</p>
+                  </div>
+                }
+                @case ('activity') {
+                  <div>
+                    <p>Lista de actividades recientes</p>
+                  </div>
+                }
+              }
+            </app-base-widget>
+          </mat-grid-tile>
+        }
       </mat-grid-list>
     </div>
   `,
@@ -63,26 +68,56 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       background-color: #f5f5f5;
       min-height: calc(100vh - 64px);
     }
-    
-    .dashboard-card {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    
-    mat-card-content {
-      flex-grow: 1;
-    }
   `]
 })
-export class DashboardComponent {
-  private cdr = inject(ChangeDetectorRef);
+export class DashboardComponent implements OnInit {
+  private dashboardService: IDashboardService = inject(DashboardService);
   
-  // Para operaciones asíncronas, llama manualmente a detectChanges()
-  async loadData() {
-    // ... operación asíncrona
-    this.cdr.detectChanges(); // Detección manual de cambios
+  // Hacer WidgetType accesible en el template
+  readonly WidgetType = WidgetType;
+  
+  widgets: DashboardWidget[] = [];
+
+  async ngOnInit(): Promise<void> {
+    await this.loadWidgets();
+  }
+
+  private async loadWidgets(): Promise<void> {
+    try {
+      console.log('Cargando widgets...');
+      this.widgets = await this.dashboardService.getWidgets();
+      console.log('Widgets cargados:', this.widgets);
+      console.log('Número de widgets:', this.widgets.length);
+    } catch (error) {
+      console.error('Error loading widgets:', error);
+    }
+  }
+
+  getPrimaryActionText(widgetType: WidgetType): string {
+    switch (widgetType) {
+      case WidgetType.STATISTICS: return 'Ver más';
+      case WidgetType.ACTIVITY: return 'Ver historial';
+      case WidgetType.CHART: return 'Ver gráfico';
+      default: return 'Acción';
+    }
+  }
+
+  getSecondaryActionText(widgetType: WidgetType): string | undefined {
+    switch (widgetType) {
+      case WidgetType.STATISTICS: return 'Exportar';
+      case WidgetType.ACTIVITY: return 'Filtrar';
+      case WidgetType.CHART: return 'Configurar';
+      default: return undefined;
+    }
+  }
+
+  async handlePrimaryAction(widget: DashboardWidget): Promise<void> {
+    // Lógica específica por tipo de widget
+    console.log(`Primary action for widget: ${widget.id}`);
+  }
+
+  async handleSecondaryAction(widget: DashboardWidget): Promise<void> {
+    // Lógica específica por tipo de widget
+    console.log(`Secondary action for widget: ${widget.id}`);
   }
 }
