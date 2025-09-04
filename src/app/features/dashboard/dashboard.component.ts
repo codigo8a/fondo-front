@@ -22,11 +22,7 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       <span>Dashboard</span>
     </mat-toolbar>
     
-    <div class="dashboard-container">
-      <div class="hola-container">
-        <h1>{{ clienteIdAleatorio }}</h1>
-      </div>
-      
+    <div class="dashboard-container">     
       <div class="components-container">
         <div class="component-left">
           <app-cliente [clienteId]="clienteIdAleatorio"></app-cliente>
