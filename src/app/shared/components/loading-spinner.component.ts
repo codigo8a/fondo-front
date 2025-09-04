@@ -1,35 +1,28 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-loading-spinner',
   standalone: true,
-  imports: [CommonModule],
+  imports: [MatProgressSpinnerModule],
   template: `
     <div class="spinner-container">
-      <div class="spinner"></div>
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando...</p>
     </div>
   `,
   styles: [`
     .spinner-container {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       padding: 20px;
     }
     
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    p {
+      margin-top: 16px;
+      color: #666;
     }
   `]
 })

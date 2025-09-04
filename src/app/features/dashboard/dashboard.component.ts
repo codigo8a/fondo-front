@@ -1,90 +1,88 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatGridListModule,
+    MatToolbarModule
+  ],
   template: `
-    <div class="dashboard">
-      <h1>Dashboard</h1>
-      <div class="dashboard-content">
-        <div class="card">
-          <h2>Bienvenido</h2>
-          <p>Esta es tu aplicación de dashboard simplificada.</p>
-        </div>
+    <mat-toolbar color="primary">
+      <mat-icon>dashboard</mat-icon>
+      <span>Dashboard</span>
+    </mat-toolbar>
+    
+    <div class="dashboard-container">
+      <mat-grid-list cols="2" rowHeight="200px" gutterSize="16px">
+        <mat-grid-tile>
+          <mat-card class="dashboard-card">
+            <mat-card-header>
+              <mat-card-title>Estadísticas</mat-card-title>
+              <mat-card-subtitle>Resumen general</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p>Contenido de estadísticas aquí</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary">Ver más</button>
+            </mat-card-actions>
+          </mat-card>
+        </mat-grid-tile>
         
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h3>Estadística 1</h3>
-            <p class="stat-number">{{ stat1 }}</p>
-          </div>
-          
-          <div class="stat-card">
-            <h3>Estadística 2</h3>
-            <p class="stat-number">{{ stat2 }}</p>
-          </div>
-          
-          <div class="stat-card">
-            <h3>Estadística 3</h3>
-            <p class="stat-number">{{ stat3 }}</p>
-          </div>
-        </div>
-      </div>
+        <mat-grid-tile>
+          <mat-card class="dashboard-card">
+            <mat-card-header>
+              <mat-card-title>Actividad Reciente</mat-card-title>
+              <mat-card-subtitle>Últimas acciones</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p>Lista de actividades recientes</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="accent">Ver historial</button>
+            </mat-card-actions>
+          </mat-card>
+        </mat-grid-tile>
+      </mat-grid-list>
     </div>
   `,
   styles: [`
-    .dashboard {
+    .dashboard-container {
       padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
+      background-color: #f5f5f5;
+      min-height: calc(100vh - 64px);
     }
     
-    .dashboard-content {
-      margin-top: 20px;
+    .dashboard-card {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    
-    .stat-card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    
-    .stat-number {
-      font-size: 2em;
-      font-weight: bold;
-      color: #007bff;
-      margin: 10px 0;
-    }
-    
-    h1 {
-      color: #333;
-      margin-bottom: 20px;
-    }
-    
-    h2, h3 {
-      color: #555;
+    mat-card-content {
+      flex-grow: 1;
     }
   `]
 })
 export class DashboardComponent {
-  stat1 = 150;
-  stat2 = 75;
-  stat3 = 230;
+  private cdr = inject(ChangeDetectorRef);
+  
+  // Para operaciones asíncronas, llama manualmente a detectChanges()
+  async loadData() {
+    // ... operación asíncrona
+    this.cdr.detectChanges(); // Detección manual de cambios
+  }
 }
