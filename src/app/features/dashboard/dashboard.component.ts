@@ -2,8 +2,7 @@ import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { HttpClient } from '@angular/common/http';
-import { Cliente } from './interfaces/cliente.interface';
+import { IClienteRandomService, ClienteRandomService } from './services/cliente-random.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -64,54 +63,22 @@ import { Cliente } from './interfaces/cliente.interface';
   `]
 })
 export class DashboardComponent {
-  private http = inject(HttpClient);
-  private cdr = inject(ChangeDetectorRef);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly clienteRandomService: IClienteRandomService = inject(ClienteRandomService);
+  
   clienteIdAleatorio: string = 'HOLA';
-  private idsUtilizados: Set<string> = new Set();
-  private todosLosClientes: Cliente[] = [];
 
   obtenerClienteAleatorio(): void {
-    this.http.get<Cliente[]>('http://localhost:8080/api/clientes')
-      .subscribe({
-        next: (clientes) => {
-          if (clientes && clientes.length > 0) {
-            this.todosLosClientes = clientes;
-            
-            // Si ya se usaron todos los IDs, reiniciar el historial
-            if (this.idsUtilizados.size >= clientes.length) {
-              this.idsUtilizados.clear();
-            }
-            
-            // Filtrar clientes no utilizados
-            const clientesDisponibles = clientes.filter(cliente => 
-              !this.idsUtilizados.has(cliente.id)
-            );
-            
-            if (clientesDisponibles.length > 0) {
-              const indiceAleatorio = Math.floor(Math.random() * clientesDisponibles.length);
-              const clienteSeleccionado = clientesDisponibles[indiceAleatorio];
-              
-              this.clienteIdAleatorio = clienteSeleccionado.id;
-              this.idsUtilizados.add(clienteSeleccionado.id);
-            } else {
-              // Fallback: si no hay disponibles, tomar cualquiera
-              const indiceAleatorio = Math.floor(Math.random() * clientes.length);
-              this.clienteIdAleatorio = clientes[indiceAleatorio].id;
-            }
-            
-            this.cdr.detectChanges();
-          }
-        },
-        error: (error) => {
-          console.error('Error al obtener clientes:', error);
-          this.clienteIdAleatorio = 'Error al cargar';
-          this.cdr.detectChanges();
-        }
-      });
+    this.clienteRandomService.obtenerClienteAleatorio().subscribe({
+      next: (clienteId) => {
+        this.clienteIdAleatorio = clienteId;
+        this.cdr.detectChanges();
+      }
+    });
   }
   
   reiniciarHistorial(): void {
-    this.idsUtilizados.clear();
+    this.clienteRandomService.reiniciarHistorial();
     this.clienteIdAleatorio = 'HOLA';
     this.cdr.detectChanges();
   }
