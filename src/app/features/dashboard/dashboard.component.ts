@@ -31,11 +31,9 @@ import { BaseWidgetComponent } from './components/base-widget/base-widget.compon
     </mat-toolbar>
     
     <div class="dashboard-container">
-      <p>Total widgets: {{ widgets.length }}</p>
-      <mat-grid-list cols="2" rowHeight="200px" gutterSize="16px">
+      <mat-grid-list cols="2" rowHeight="fit" gutterSize="16px">
         @for (widget of widgets; track widget.id) {
           <mat-grid-tile>
-            <p>Widget: {{ widget.title }}</p>
             <app-base-widget 
               [widget]="widget"
               [primaryActionText]="getPrimaryActionText(widget.type)"
@@ -68,6 +66,14 @@ import { BaseWidgetComponent } from './components/base-widget/base-widget.compon
       background-color: #f5f5f5;
       min-height: calc(100vh - 64px);
     }
+    
+    mat-grid-list {
+      height: calc(100vh - 120px);
+    }
+    
+    mat-grid-tile {
+      background: transparent;
+    }
   `]
 })
 export class DashboardComponent implements OnInit {
@@ -84,10 +90,7 @@ export class DashboardComponent implements OnInit {
 
   private async loadWidgets(): Promise<void> {
     try {
-      console.log('Cargando widgets...');
       this.widgets = await this.dashboardService.getWidgets();
-      console.log('Widgets cargados:', this.widgets);
-      console.log('Número de widgets:', this.widgets.length);
     } catch (error) {
       console.error('Error loading widgets:', error);
     }
