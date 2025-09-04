@@ -2,7 +2,10 @@ import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { IClienteRandomService, ClienteRandomService } from './services/cliente-random.service';
+import { HttpClient } from '@angular/common/http';
+import { Cliente } from './interfaces/cliente.interface';
+import { ClienteComponent } from './components/cliente/cliente.component';
+import { InscripcionesComponent } from './components/inscripciones/inscripciones.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,7 +13,9 @@ import { IClienteRandomService, ClienteRandomService } from './services/cliente-
   imports: [
     CommonModule,
     MatToolbarModule,
-    MatButtonModule
+    MatButtonModule,
+    ClienteComponent,
+    InscripcionesComponent
   ],
   template: `
     <mat-toolbar color="primary">
@@ -20,6 +25,16 @@ import { IClienteRandomService, ClienteRandomService } from './services/cliente-
     <div class="dashboard-container">
       <div class="hola-container">
         <h1>{{ clienteIdAleatorio }}</h1>
+      </div>
+      
+      <div class="components-container">
+        <div class="component-left">
+          <app-cliente [clienteId]="clienteIdAleatorio"></app-cliente>
+        </div>
+        
+        <div class="component-right">
+          <app-inscripciones [clienteId]="clienteIdAleatorio"></app-inscripciones>
+        </div>
       </div>
       
       <div class="button-container">
@@ -37,16 +52,31 @@ import { IClienteRandomService, ClienteRandomService } from './services/cliente-
       display: flex;
       flex-direction: column;
       height: calc(100vh - 64px);
+      padding: 20px;
     }
     
     .hola-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      flex: 1;
+      margin-bottom: 20px;
       font-size: 3rem;
       font-weight: bold;
       color: #333;
+    }
+    
+    .components-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    
+    .component-left,
+    .component-right {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
     }
     
     .button-container {
@@ -63,22 +93,52 @@ import { IClienteRandomService, ClienteRandomService } from './services/cliente-
   `]
 })
 export class DashboardComponent {
+  private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly clienteRandomService: IClienteRandomService = inject(ClienteRandomService);
   
   clienteIdAleatorio: string = 'HOLA';
+  private readonly idsUtilizados: Set<string> = new Set();
 
   obtenerClienteAleatorio(): void {
-    this.clienteRandomService.obtenerClienteAleatorio().subscribe({
-      next: (clienteId) => {
-        this.clienteIdAleatorio = clienteId;
-        this.cdr.detectChanges();
-      }
-    });
+    this.http.get<Cliente[]>('http://localhost:8080/api/clientes')
+      .subscribe({
+        next: (clientes) => {
+          if (clientes && clientes.length > 0) {
+            // Si ya se usaron todos los IDs, reiniciar el historial
+            if (this.idsUtilizados.size >= clientes.length) {
+              this.idsUtilizados.clear();
+            }
+            
+            // Filtrar clientes no utilizados
+            const clientesDisponibles = clientes.filter(cliente => 
+              !this.idsUtilizados.has(cliente.id)
+            );
+            
+            if (clientesDisponibles.length > 0) {
+              const indiceAleatorio = Math.floor(Math.random() * clientesDisponibles.length);
+              const clienteSeleccionado = clientesDisponibles[indiceAleatorio];
+              
+              this.clienteIdAleatorio = clienteSeleccionado.id;
+              this.idsUtilizados.add(clienteSeleccionado.id);
+            } else {
+              // Fallback: si no hay disponibles, tomar cualquiera
+              const indiceAleatorio = Math.floor(Math.random() * clientes.length);
+              this.clienteIdAleatorio = clientes[indiceAleatorio].id;
+            }
+            
+            this.cdr.detectChanges();
+          }
+        },
+        error: (error) => {
+          console.error('Error al obtener clientes:', error);
+          this.clienteIdAleatorio = 'Error al cargar';
+          this.cdr.detectChanges();
+        }
+      });
   }
   
   reiniciarHistorial(): void {
-    this.clienteRandomService.reiniciarHistorial();
+    this.idsUtilizados.clear();
     this.clienteIdAleatorio = 'HOLA';
     this.cdr.detectChanges();
   }
