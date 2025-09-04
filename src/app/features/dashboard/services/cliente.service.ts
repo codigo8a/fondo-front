@@ -13,4 +13,8 @@ export class ClienteService {
   obtenerClientes(): Observable<Cliente[]> {
     return this.http.get<Cliente[]>(this.API_URL);
   }
+
+  obtenerClientePorId(id: string): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.API_URL}/${id}`);
+  }
 }
