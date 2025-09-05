@@ -17,4 +17,10 @@ export class ClienteService {
   obtenerClientePorId(id: string): Observable<Cliente> {
     return this.http.get<Cliente>(`${this.API_URL}/${id}`);
   }
+
+  actualizarMonto(clienteId: string, nuevoMonto: number): Observable<any> {
+    return this.http.patch(`${this.API_URL}/${clienteId}/monto`, {
+      monto: nuevoMonto
+    });
+  }
 }

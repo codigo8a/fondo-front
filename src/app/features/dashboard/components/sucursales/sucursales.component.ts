@@ -205,19 +205,53 @@ export class SucursalesComponent implements OnInit {
         next: (response) => {
           console.log('Inscripción exitosa:', response);
           
-          // Mostrar alerta de éxito
-          this.dialog.open(AlertDialogComponent, {
-            data: {
-              title: 'Inscripción Exitosa',
-              message: 'La inscripción se ha realizado correctamente.',
-              type: 'success'
-            },
-            width: '400px',
-            disableClose: false
-          });
-          
-          // Cerrar el modal y enviar el resultado
-          this.dialogRef.close({ success: true, data: response });
+          // Actualizar el monto del cliente después de la inscripción exitosa
+          if (this.cliente) {
+            const nuevoMonto = this.cliente.monto - montoNumerico;
+            
+            this.clienteService.actualizarMonto(this.clienteId!, nuevoMonto)
+              .subscribe({
+                next: () => {
+                  console.log('Monto del cliente actualizado exitosamente');
+                  
+                  // Actualizar el monto local del cliente
+                  if (this.cliente) {
+                    this.cliente.monto = nuevoMonto;
+                  }
+                  
+                  // Mostrar alerta de éxito
+                  this.dialog.open(AlertDialogComponent, {
+                    data: {
+                      title: 'Inscripción Exitosa',
+                      message: 'La inscripción se ha realizado correctamente y su saldo ha sido actualizado.',
+                      type: 'success'
+                    },
+                    width: '400px',
+                    disableClose: false
+                  });
+                  
+                  // Cerrar el modal y enviar el resultado
+                  this.dialogRef.close({ success: true, data: response });
+                },
+                error: (error) => {
+                  console.error('Error al actualizar el monto del cliente:', error);
+                  
+                  // Mostrar alerta de advertencia - la inscripción fue exitosa pero el monto no se actualizó
+                  this.dialog.open(AlertDialogComponent, {
+                    data: {
+                      title: 'Inscripción Exitosa',
+                      message: 'La inscripción se realizó correctamente, pero hubo un problema al actualizar su saldo. Por favor, contacte al administrador.',
+                      type: 'warning'
+                    },
+                    width: '400px',
+                    disableClose: false
+                  });
+                  
+                  // Cerrar el modal y enviar el resultado
+                  this.dialogRef.close({ success: true, data: response });
+                }
+              });
+          }
         },
         error: (error) => {
           console.error('Error al crear inscripción:', error);
