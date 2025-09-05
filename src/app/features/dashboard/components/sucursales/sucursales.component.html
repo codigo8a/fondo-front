@@ -52,16 +52,10 @@
 
   <!-- Vista de Productos -->
   <div *ngIf="sucursalSeleccionada">
-    <div class="sucursal-info-header">
-      <h3>{{ sucursalSeleccionada.nombre }}</h3>
-      <p><strong>Ciudad:</strong> {{ sucursalSeleccionada.ciudad }}</p>
-    </div>
-
     <div *ngIf="cargandoProductos" class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
       <p>Cargando productos...</p>
     </div>
-    
     <div *ngIf="errorProductos && !cargandoProductos" class="error-container">
       <mat-icon color="warn">error</mat-icon>
       <p>Error al cargar los productos</p>
