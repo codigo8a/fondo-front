@@ -13,7 +13,6 @@ import { Sucursal } from '../../interfaces/sucursal.interface';
 import { Producto } from '../../interfaces/producto.interface';
 import { InscripcionRequest } from '../../interfaces/inscripcion.interface';
 import { AlertDialogComponent } from '../alert-dialog/alert-dialog.component';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClienteService } from '../../services/cliente.service';
 import { Cliente } from '../../interfaces/cliente.interface';
 
@@ -29,8 +28,8 @@ import { Cliente } from '../../interfaces/cliente.interface';
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatTooltipModule,
-    MatSnackBarModule
+    MatTooltipModule
+    // Remover MatSnackBarModule si no se usa en otro lugar
   ],
   templateUrl: './sucursales.component.html',
   styleUrls: ['./sucursales.component.scss']
@@ -40,7 +39,8 @@ export class SucursalesComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly dialogRef = inject(MatDialogRef<SucursalesComponent>);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  // Remover esta línea si no se usa en otro lugar:
+  // private readonly snackBar = inject(MatSnackBar);
   private readonly clienteService = inject(ClienteService);
   
   clienteId: string = '';
@@ -160,25 +160,33 @@ export class SucursalesComponent implements OnInit {
   invertir(producto: Producto, monto: number | string | null): void {
     const montoNumerico = typeof monto === 'string' ? parseFloat(monto) : Number(monto);
     
-    if (!monto || isNaN(montoNumerico) || montoNumerico < producto.montoMinimo) {
-      this.snackBar.open('El monto debe ser mayor o igual al monto mínimo del producto', 'Cerrar', {
-        duration: 3000,
-        panelClass: ['error-snackbar']
-      });
-      return;
-    }
-
-    // Nueva validación: verificar que el monto no sea mayor al disponible del cliente
-    if (this.cliente && montoNumerico > this.cliente.monto) {
-      this.snackBar.open(`El monto a invertir no puede ser mayor a su saldo disponible: ${this.cliente.monto.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}`, 'Cerrar', {
-        duration: 4000,
-        panelClass: ['error-snackbar']
+    // Validar si el monto es válido usando el método de validación existente
+    if (!this.validarMonto(monto, producto)) {
+      const mensajeError = this.obtenerMensajeErrorMonto(monto, producto);
+      
+      // Mostrar alerta de error de validación
+      this.dialog.open(AlertDialogComponent, {
+        data: {
+          title: 'Error de Validación',
+          message: mensajeError,
+          type: 'error'
+        },
+        width: '400px',
+        disableClose: false
       });
       return;
     }
     
     if (!this.clienteId || !this.sucursalSeleccionada) {
-      console.error('Faltan datos requeridos: clienteId o sucursal seleccionada');
+      this.dialog.open(AlertDialogComponent, {
+        data: {
+          title: 'Error',
+          message: 'Faltan datos requeridos para procesar la inversión.',
+          type: 'error'
+        },
+        width: '400px',
+        disableClose: false
+      });
       return;
     }
 

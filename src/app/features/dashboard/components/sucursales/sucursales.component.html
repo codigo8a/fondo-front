@@ -72,14 +72,8 @@
           <span class="tipo-badge">{{ producto.tipoProducto }}</span>
         </div>
         <div class="producto-info">
-          <h4>{{ producto.nombre }}</h4>
           <p><strong>ID:</strong> {{ producto.id }}</p>
           <p><strong>Monto Mínimo:</strong> {{ producto.montoMinimo | currency:'COL':'symbol':'1.0-0' }}</p>
-          <div class="saldo-disponible" *ngIf="cliente">
-            <p><strong>Saldo Disponible:</strong> 
-              <span class="saldo-amount">{{ cliente.monto | currency:'COL':'symbol':'1.2-2' }}</span>
-            </p>
-          </div>
         </div>
         <div class="producto-actions">
           <div class="input-container">
