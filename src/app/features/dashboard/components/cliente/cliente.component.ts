@@ -57,22 +57,34 @@ export class ClienteComponent implements OnInit, OnChanges {
     esIdMongoValido: true
   };
 
+  // Propiedad computed para el estado del botón (independiente del spinner)
+  get botonHabilitado(): boolean {
+    return !!(this.clienteId && this.clienteId.trim() !== '' && !this.state.cargando && !this.state.error);
+  }
+
   ngOnInit(): void {
     if (this.clienteId) {
       this.validarYCargarCliente();
     }
   }
 
+  // Estado separado para el botón
+  botonDeshabilitado: boolean = true;
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['clienteId']) {
       this.resetearEstados();
+      this.actualizarEstadoBoton();
       
-      if (changes['clienteId'].currentValue) {
+      if (this.clienteId && this.clienteId.trim() !== '') {
         this.validarYCargarCliente();
       }
     }
   }
 
+  private actualizarEstadoBoton(): void {
+    this.botonDeshabilitado = !(this.clienteId && this.clienteId.trim() !== '');
+  }
   // Método para resetear estados (SRP)
   private resetearEstados(): void {
     this.state = {
@@ -88,13 +100,16 @@ export class ClienteComponent implements OnInit, OnChanges {
   private validarYCargarCliente(): void {
     if (!this.clienteId) {
       this.state.esIdMongoValido = false;
+      this.state.cargando = false;
+      this.state.error = false;
+      this.state.cliente = null;
       this.cdr.detectChanges();
       return;
     }
-
+  
     // Usar la clase de validación (SRP)
     this.state.esIdMongoValido = ClienteValidator.validarIdMongo(this.clienteId);
-
+  
     if (this.state.esIdMongoValido) {
       this.cargarCliente();
     } else {

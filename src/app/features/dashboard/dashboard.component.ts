@@ -116,10 +116,7 @@ export class DashboardComponent {
   private readonly idsUtilizados: Set<string> = new Set();
 
   obtenerClienteAleatorio(): void {
-    // Primero establecer un valor temporal para forzar detección de cambios
-    this.clienteIdAleatorio = 'loading...';
-    this.cdr.detectChanges();
-    
+    // NO usar valores temporales, simplemente hacer la petición
     this.http.get<Cliente[]>('http://localhost:8080/api/clientes')
       .subscribe({
         next: (clientes) => {
@@ -145,13 +142,16 @@ export class DashboardComponent {
               const indiceAleatorio = Math.floor(Math.random() * clientes.length);
               this.clienteIdAleatorio = clientes[indiceAleatorio].id;
             }
-            
-            this.cdr.detectChanges();
+          } else {
+            console.warn('No se encontraron clientes');
+            this.clienteIdAleatorio = '';
           }
+          
+          this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error al obtener clientes:', error);
-          this.clienteIdAleatorio = 'error';
+          this.clienteIdAleatorio = '';
           this.cdr.detectChanges();
         }
       });

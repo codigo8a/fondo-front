@@ -51,9 +51,14 @@
     }
   </mat-card-content>
   <mat-card-actions class="card-actions">
-    <button mat-raised-button color="accent" (click)="abrirModal()" class="modal-button">
-      <mat-icon>open_in_new</mat-icon>
-      Abrir Modal
+    <button 
+      mat-raised-button 
+      color="accent" 
+      (click)="abrirModal()" 
+      class="modal-button"
+      [disabled]="!botonHabilitado">
+      <mat-icon>add</mat-icon>
+      Nueva Inscripción
     </button>
   </mat-card-actions>
 </mat-card>
