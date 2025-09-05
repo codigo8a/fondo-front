@@ -3,11 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node server.js",
     "build": "ng build",
+    "build:ssr": "ng build && ng run fondo-front:server",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:fondo-front": "node dist/fondo-front/server/server.mjs"
+    "serve:ssr:fondo-front": "node dist/fondo-front/server/server.mjs",
+    "heroku-postbuild": "ng build --configuration production && ng run fondo-front:server"
   },
   "prettier": {
     "printWidth": 100,
