@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
 import { AlertDialogComponent } from '../alert-dialog.component';
 import { IAlertDialogData, IAlertDialogConfig, AlertType } from '../interfaces/alert-dialog.interfaces';
 
@@ -35,6 +36,40 @@ export class AlertDialogService {
       data: dialogData,
       ...finalConfig
     });
+  }
+
+  openConfirmDialog(
+    title: string,
+    message: string,
+    confirmText: string = 'Confirmar',
+    cancelText: string = 'Cancelar',
+    config?: IAlertDialogConfig
+  ): Observable<boolean> {
+    const dialogData: IAlertDialogData = {
+      title,
+      message,
+      type: 'confirm',
+      isConfirmation: true,
+      confirmText,
+      cancelText
+    };
+
+    const defaultConfig: IAlertDialogConfig = {
+      width: '400px',
+      maxWidth: '90vw',
+      disableClose: false,
+      panelClass: 'custom-dialog-container',
+      backdropClass: 'custom-dialog-backdrop'
+    };
+
+    const finalConfig = { ...defaultConfig, ...config };
+
+    const dialogRef = this.dialog.open(AlertDialogComponent, {
+      data: dialogData,
+      ...finalConfig
+    });
+
+    return dialogRef.afterClosed();
   }
 
   openSuccessAlert(title: string, message: string, config?: IAlertDialogConfig) {

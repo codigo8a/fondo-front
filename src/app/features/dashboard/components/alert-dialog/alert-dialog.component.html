@@ -9,8 +9,17 @@
     <p>{{ data.message || 'Sin mensaje disponible' }}</p>
   </div>
   <div mat-dialog-actions class="alert-actions">
-    <button mat-raised-button [color]="getButtonColor()" (click)="close()" class="action-button">
-      Aceptar
-    </button>
+    @if (data.isConfirmation) {
+      <button mat-button (click)="cancel()" class="cancel-button">
+        {{ data.cancelText || 'Cancelar' }}
+      </button>
+      <button mat-raised-button color="warn" (click)="confirm()" class="confirm-button">
+        {{ data.confirmText || 'Confirmar' }}
+      </button>
+    } @else {
+      <button mat-raised-button [color]="getButtonColor()" (click)="close()" class="action-button">
+        Aceptar
+      </button>
+    }
   </div>
 </div>

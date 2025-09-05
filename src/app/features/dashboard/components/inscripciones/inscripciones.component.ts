@@ -9,6 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { InscripcionService } from '../../services/inscripcion.service';
 import { Inscripcion } from '../../interfaces/inscripcion.interface';
+import { AlertDialogService } from '../alert-dialog/services/alert-dialog.service';
 
 // Interface para el estado del componente (ISP)
 interface InscripcionesComponentState {
@@ -49,6 +50,7 @@ export class InscripcionesComponent implements OnInit, OnChanges {
   
   // Inyección de dependencias (DIP)
   private readonly inscripcionService = inject(InscripcionService);
+  private readonly alertDialogService = inject(AlertDialogService);
   private readonly cdr = inject(ChangeDetectorRef);
   
   // Estado del componente
@@ -140,30 +142,55 @@ export class InscripcionesComponent implements OnInit, OnChanges {
     }
   }
 
-  // Método para eliminar inscripción
+  // Método para eliminar inscripción con confirmación
   eliminarInscripcion(inscripcionId: string): void {
-    if (confirm('¿Está seguro de que desea eliminar esta inscripción?')) {
-      this.state.eliminando = inscripcionId;
-      this.cdr.detectChanges();
+    const inscripcion = this.state.inscripciones.find(i => i.id === inscripcionId);
+    const nombreProducto = inscripcion?.producto.nombre || 'esta inscripción';
+    
+    this.alertDialogService.openConfirmDialog(
+      'Confirmar eliminación',
+      `¿Está seguro de que desea eliminar la inscripción del producto "${nombreProducto}"? Esta acción no se puede deshacer.`,
+      'Eliminar',
+      'Cancelar'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.ejecutarEliminacion(inscripcionId);
+      }
+    });
+  }
 
-      this.inscripcionService.eliminarInscripcion(inscripcionId).subscribe({
-        next: () => {
-          // Remover la inscripción del array local
-          this.state.inscripciones = this.state.inscripciones.filter(
-            inscripcion => inscripcion.id !== inscripcionId
-          );
-          this.state.eliminando = null;
-          this.cdr.detectChanges();
-          console.log('Inscripción eliminada exitosamente');
-        },
-        error: (error) => {
-          console.error('Error al eliminar inscripción:', error);
-          this.state.eliminando = null;
-          this.cdr.detectChanges();
-          alert('Error al eliminar la inscripción. Por favor, inténtelo de nuevo.');
-        }
-      });
-    }
+  // Método privado para ejecutar la eliminación
+  private ejecutarEliminacion(inscripcionId: string): void {
+    this.state.eliminando = inscripcionId;
+    this.cdr.detectChanges();
+
+    this.inscripcionService.eliminarInscripcion(inscripcionId).subscribe({
+      next: () => {
+        // Remover la inscripción del array local
+        this.state.inscripciones = this.state.inscripciones.filter(
+          inscripcion => inscripcion.id !== inscripcionId
+        );
+        this.state.eliminando = null;
+        this.cdr.detectChanges();
+        
+        // Mostrar mensaje de éxito
+        this.alertDialogService.openSuccessAlert(
+          'Eliminación exitosa',
+          'La inscripción ha sido eliminada correctamente.'
+        );
+      },
+      error: (error) => {
+        console.error('Error al eliminar inscripción:', error);
+        this.state.eliminando = null;
+        this.cdr.detectChanges();
+        
+        // Mostrar mensaje de error
+        this.alertDialogService.openErrorAlert(
+          'Error al eliminar',
+          'No se pudo eliminar la inscripción. Por favor, inténtelo de nuevo.'
+        );
+      }
+    });
   }
 
   // Método para verificar si una inscripción se está eliminando

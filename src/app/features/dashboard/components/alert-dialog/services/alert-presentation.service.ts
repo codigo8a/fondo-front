@@ -5,27 +5,25 @@ import { AlertType } from '../interfaces/alert-dialog.interfaces';
   providedIn: 'root'
 })
 export class AlertPresentationService {
-  getIconForType(type: AlertType): string {
+  getIcon(type: AlertType): string {
     const iconMap: Record<AlertType, string> = {
       success: 'check_circle',
       error: 'error',
       warning: 'warning',
-      info: 'info'
+      info: 'info',
+      confirm: 'help_outline'
     };
     return iconMap[type] || 'info';
   }
 
-  getButtonColorForType(type: AlertType): string {
+  getButtonColor(type: AlertType): string {
     const colorMap: Record<AlertType, string> = {
       success: 'primary',
       error: 'warn',
       warning: 'accent',
-      info: 'primary'
+      info: 'primary',
+      confirm: 'primary'
     };
     return colorMap[type] || 'primary';
-  }
-
-  getCssClassForType(type: AlertType): string {
-    return `alert-${type}`;
   }
 }

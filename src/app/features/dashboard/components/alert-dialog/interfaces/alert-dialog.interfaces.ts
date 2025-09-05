@@ -2,10 +2,15 @@ export interface IAlertDialogData {
   title: string;
   message: string;
   type: AlertType;
+  isConfirmation?: boolean;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 export interface IAlertDialogActions {
   close(): void;
+  confirm?(): void;
+  cancel?(): void;
 }
 
 export interface IAlertDialogPresentation {
@@ -13,7 +18,7 @@ export interface IAlertDialogPresentation {
   getButtonColor(): string;
 }
 
-export type AlertType = 'success' | 'error' | 'warning' | 'info';
+export type AlertType = 'success' | 'error' | 'warning' | 'info' | 'confirm';
 
 export interface IAlertDialogConfig {
   width?: string;

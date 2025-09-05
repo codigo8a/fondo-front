@@ -1,12 +1,12 @@
 import { Component, Inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { 
-  IAlertDialogData, 
-  IAlertDialogActions, 
-  IAlertDialogPresentation 
+import {
+  IAlertDialogData,
+  IAlertDialogActions,
+  IAlertDialogPresentation
 } from './interfaces/alert-dialog.interfaces';
 import { AlertPresentationService } from './services/alert-presentation.service';
 
@@ -21,25 +21,28 @@ export class AlertDialogComponent implements IAlertDialogActions, IAlertDialogPr
   constructor(
     public dialogRef: MatDialogRef<AlertDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IAlertDialogData,
-    private presentationService: AlertPresentationService
+    private alertPresentationService: AlertPresentationService
   ) {
-    // Debug: Verificar que los datos se reciben correctamente
     console.log('AlertDialogComponent data:', this.data);
   }
 
+  close(): void {
+    this.dialogRef.close(false);
+  }
+
+  confirm(): void {
+    this.dialogRef.close(true);
+  }
+
+  cancel(): void {
+    this.dialogRef.close(false);
+  }
+
   getIcon(): string {
-    const icon = this.presentationService.getIconForType(this.data.type || 'info');
-    console.log('Icon for type', this.data.type, ':', icon);
-    return icon;
+    return this.alertPresentationService.getIcon(this.data.type);
   }
 
   getButtonColor(): string {
-    const color = this.presentationService.getButtonColorForType(this.data.type || 'info');
-    console.log('Button color for type', this.data.type, ':', color);
-    return color;
-  }
-
-  close(): void {
-    this.dialogRef.close();
+    return this.alertPresentationService.getButtonColor(this.data.type);
   }
 }
