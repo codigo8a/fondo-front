@@ -80,13 +80,28 @@ mat-card-title {
   }
 }
 
+.producto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+}
+
 .producto-nombre {
   font-size: 1.1rem;
   color: #1976d2;
   margin: 0;
-  width: 100%;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tipo-producto-chip {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .inscripcion-details {

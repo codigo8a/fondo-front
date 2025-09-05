@@ -26,14 +26,14 @@
         @for (inscripcion of state.inscripciones; track inscripcion.id) {
           <mat-card class="inscripcion-item">
             <mat-card-header>
-              <mat-card-title class="producto-nombre">
-                {{ inscripcion.producto.nombre }}
-              </mat-card-title>
-              <mat-card-subtitle>
-                <mat-chip color="primary" selected>
+              <mat-card-title class="producto-header">
+                <span class="producto-nombre">
+                  {{ inscripcion.producto.nombre }}
+                </span>
+                <mat-chip color="primary" selected class="tipo-producto-chip">
                   {{ inscripcion.producto.tipoProducto }}
                 </mat-chip>
-              </mat-card-subtitle>
+              </mat-card-title>
             </mat-card-header>
             <mat-card-content>
               <div class="inscripcion-details">
