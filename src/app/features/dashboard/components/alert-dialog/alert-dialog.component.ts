@@ -28,14 +28,14 @@ export class AlertDialogComponent implements IAlertDialogActions, IAlertDialogPr
   }
 
   getIcon(): string {
-    const icon = this.presentationService.getIconForType(this.data?.type || 'info');
-    console.log('Icon for type', this.data?.type, ':', icon);
+    const icon = this.presentationService.getIconForType(this.data.type || 'info');
+    console.log('Icon for type', this.data.type, ':', icon);
     return icon;
   }
 
   getButtonColor(): string {
-    const color = this.presentationService.getButtonColorForType(this.data?.type || 'info');
-    console.log('Button color for type', this.data?.type, ':', color);
+    const color = this.presentationService.getButtonColorForType(this.data.type || 'info');
+    console.log('Button color for type', this.data.type, ':', color);
     return color;
   }
 
