@@ -72,20 +72,34 @@
           <span class="tipo-badge">{{ producto.tipoProducto }}</span>
         </div>
         <div class="producto-info">
+          <h4>{{ producto.nombre }}</h4>
           <p><strong>ID:</strong> {{ producto.id }}</p>
           <p><strong>Monto Mínimo:</strong> {{ producto.montoMinimo | currency:'COL':'symbol':'1.0-0' }}</p>
+          <div class="saldo-disponible" *ngIf="cliente">
+            <p><strong>Saldo Disponible:</strong> 
+              <span class="saldo-amount">{{ cliente.monto | currency:'COL':'symbol':'1.2-2' }}</span>
+            </p>
+          </div>
         </div>
         <div class="producto-actions">
-          <input type="number" 
-                 class="monto-input"
-                 placeholder="Monto a invertir"
-                 [(ngModel)]="montosInversion[i]"
-                 [min]="producto.montoMinimo">
+          <div class="input-container">
+            <input type="number" 
+                   class="monto-input"
+                   [class.error]="montosInversion[i] && !validarMonto(montosInversion[i], producto)"
+                   placeholder="Monto a invertir"
+                   [(ngModel)]="montosInversion[i]"
+                   [min]="producto.montoMinimo"
+                   [max]="obtenerMontoMaximo()">
+            <div class="error-message" 
+                 *ngIf="montosInversion[i] && !validarMonto(montosInversion[i], producto)">
+              {{ obtenerMensajeErrorMonto(montosInversion[i], producto) }}
+            </div>
+          </div>
           <button mat-raised-button 
                   color="primary" 
                   class="invertir-button"
                   (click)="invertir(producto, montosInversion[i])"
-                  [disabled]="!montosInversion[i] || toNumber(montosInversion[i]) < producto.montoMinimo">
+                  [disabled]="!montosInversion[i] || !validarMonto(montosInversion[i], producto)">
             <mat-icon>trending_up</mat-icon>
             Invertir
           </button>

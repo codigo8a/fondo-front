@@ -14,6 +14,8 @@ import { Producto } from '../../interfaces/producto.interface';
 import { InscripcionRequest } from '../../interfaces/inscripcion.interface';
 import { AlertDialogComponent } from '../alert-dialog/alert-dialog.component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ClienteService } from '../../services/cliente.service';
+import { Cliente } from '../../interfaces/cliente.interface';
 
 @Component({
   selector: 'app-sucursales',
@@ -39,15 +41,19 @@ export class SucursalesComponent implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<SucursalesComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly clienteService = inject(ClienteService);
   
   clienteId: string = '';
+  cliente: Cliente | null = null;
   sucursales: Sucursal[] = [];
   productos: Producto[] = [];
   sucursalSeleccionada: Sucursal | null = null;
   cargando: boolean = false;
   cargandoProductos: boolean = false;
+  cargandoCliente: boolean = false;
   error: boolean = false;
   errorProductos: boolean = false;
+  errorCliente: boolean = false;
   montosInversion: (number | string | null)[] = [];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: { clienteId: string }) {
@@ -56,6 +62,33 @@ export class SucursalesComponent implements OnInit {
   
   ngOnInit(): void {
     this.cargarSucursales();
+    this.cargarCliente();
+  }
+
+  private cargarCliente(): void {
+    if (!this.clienteId) {
+      console.error('No se proporcionó ID de cliente');
+      return;
+    }
+
+    this.cargandoCliente = true;
+    this.errorCliente = false;
+    this.cdr.detectChanges();
+
+    this.clienteService.obtenerClientePorId(this.clienteId)
+      .subscribe({
+        next: (cliente) => {
+          this.cliente = cliente;
+          this.cargandoCliente = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar cliente:', error);
+          this.errorCliente = true;
+          this.cargandoCliente = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   private cargarSucursales(): void {
@@ -128,7 +161,19 @@ export class SucursalesComponent implements OnInit {
     const montoNumerico = typeof monto === 'string' ? parseFloat(monto) : Number(monto);
     
     if (!monto || isNaN(montoNumerico) || montoNumerico < producto.montoMinimo) {
-      console.warn('El monto debe ser mayor o igual al monto mínimo del producto');
+      this.snackBar.open('El monto debe ser mayor o igual al monto mínimo del producto', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+
+    // Nueva validación: verificar que el monto no sea mayor al disponible del cliente
+    if (this.cliente && montoNumerico > this.cliente.monto) {
+      this.snackBar.open(`El monto a invertir no puede ser mayor a su saldo disponible: ${this.cliente.monto.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}`, 'Cerrar', {
+        duration: 4000,
+        panelClass: ['error-snackbar']
+      });
       return;
     }
     
@@ -195,5 +240,48 @@ export class SucursalesComponent implements OnInit {
   // Método para convertir string a number
   toNumber(value: any): number {
     return Number(value) || 0;
+  }
+
+  // Método para validar el monto en tiempo real
+  validarMonto(monto: number | string | null, producto: Producto): boolean {
+    const montoNumerico = typeof monto === 'string' ? parseFloat(monto) : Number(monto);
+    
+    if (!monto || isNaN(montoNumerico)) {
+      return false;
+    }
+    
+    if (montoNumerico < producto.montoMinimo) {
+      return false;
+    }
+    
+    if (this.cliente && montoNumerico > this.cliente.monto) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Método para obtener el mensaje de error del monto
+  obtenerMensajeErrorMonto(monto: number | string | null, producto: Producto): string {
+    const montoNumerico = typeof monto === 'string' ? parseFloat(monto) : Number(monto);
+    
+    if (!monto || isNaN(montoNumerico)) {
+      return 'Ingrese un monto válido';
+    }
+    
+    if (montoNumerico < producto.montoMinimo) {
+      return `Monto mínimo: ${producto.montoMinimo.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}`;
+    }
+    
+    if (this.cliente && montoNumerico > this.cliente.monto) {
+      return `Saldo insuficiente. Disponible: ${this.cliente.monto.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}`;
+    }
+    
+    return '';
+  }
+
+  // Método helper para obtener el monto máximo permitido
+  obtenerMontoMaximo(): number | null {
+    return this.cliente ? this.cliente.monto : null;
   }
 }
