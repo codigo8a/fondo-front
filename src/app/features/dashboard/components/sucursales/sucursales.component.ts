@@ -1,8 +1,11 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HttpClient } from '@angular/common/http';
@@ -13,10 +16,13 @@ import { Producto } from '../../interfaces/producto.interface';
   selector: 'app-sucursales',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
+    FormsModule,
     MatButtonModule, 
-    MatDialogModule, 
+    MatDialogModule,
+    MatFormFieldModule,
     MatIconModule,
+    MatInputModule,
     MatProgressSpinnerModule,
     MatTooltipModule
   ],
@@ -34,6 +40,7 @@ export class SucursalesComponent implements OnInit {
   cargandoProductos: boolean = false;
   error: boolean = false;
   errorProductos: boolean = false;
+  montosInversion: (number | string | null)[] = [];
 
   ngOnInit(): void {
     this.cargarSucursales();
@@ -69,12 +76,13 @@ export class SucursalesComponent implements OnInit {
     this.cargandoProductos = true;
     this.errorProductos = false;
     this.productos = [];
-    this.cdr.detectChanges();
+    this.montosInversion = []; // Resetear montos al cargar nuevos productos
     
     this.http.get<Producto[]>(`http://localhost:8080/api/productos/sucursal/${sucursalId}`)
       .subscribe({
         next: (productos) => {
           this.productos = productos;
+          this.montosInversion = new Array(productos.length).fill('');
           this.cargandoProductos = false;
           this.cdr.detectChanges();
         },
@@ -102,5 +110,23 @@ export class SucursalesComponent implements OnInit {
 
   recargarSucursales(): void {
     this.cargarSucursales();
+  }
+
+  invertir(producto: Producto, monto: number | string | null): void {
+    const montoNumerico = typeof monto === 'string' ? parseFloat(monto) : Number(monto);
+    
+    if (!monto || isNaN(montoNumerico) || montoNumerico < producto.montoMinimo) {
+      console.warn('El monto debe ser mayor o igual al monto mínimo del producto');
+      return;
+    }
+    
+    console.log('Invirtiendo en producto:', producto.nombre, 'Monto:', montoNumerico);
+    // Aquí puedes agregar la lógica para procesar la inversión
+    // Por ejemplo, llamar a un endpoint de inversión
+  }
+  
+  // Método para convertir string a number
+  toNumber(value: any): number {
+    return Number(value) || 0;
   }
 }

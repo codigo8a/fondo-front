@@ -66,15 +66,29 @@
     </div>
     
     <div *ngIf="!cargandoProductos && !errorProductos && productos.length > 0" class="productos-container">
-      <div *ngFor="let producto of productos" class="producto-item">
+      <div *ngFor="let producto of productos; let i = index" class="producto-item">
         <div class="producto-header">
           <h4>{{ producto.nombre }}</h4>
           <span class="tipo-badge">{{ producto.tipoProducto }}</span>
         </div>
         <div class="producto-info">
           <p><strong>ID:</strong> {{ producto.id }}</p>
-          <p><strong>Monto Mínimo:</strong> {{ producto.montoMinimo | currency:'USD':'symbol':'1.2-0' }}</p>
-          <p><strong>Disponible en {{ producto.disponibleEn.length }} sucursal(es)</strong></p>
+          <p><strong>Monto Mínimo:</strong> {{ producto.montoMinimo | currency:'COP':'symbol':'1.0-0' }}</p>
+        </div>
+        <div class="producto-actions">
+          <input type="number" 
+                 class="monto-input"
+                 placeholder="Monto a invertir"
+                 [(ngModel)]="montosInversion[i]"
+                 [min]="producto.montoMinimo">
+          <button mat-raised-button 
+                  color="primary" 
+                  class="invertir-button"
+                  (click)="invertir(producto, montosInversion[i])"
+                  [disabled]="!montosInversion[i] || toNumber(montosInversion[i]) < producto.montoMinimo">
+            <mat-icon>trending_up</mat-icon>
+            Invertir
+          </button>
         </div>
       </div>
     </div>
@@ -97,20 +111,4 @@
   </button>
   <div class="spacer"></div>
   <button mat-button mat-dialog-close>Cerrar</button>
-  <button *ngIf="!sucursalSeleccionada" 
-          mat-raised-button 
-          color="primary" 
-          (click)="recargarSucursales()" 
-          [disabled]="cargando">
-    <mat-icon>refresh</mat-icon>
-    Actualizar
-  </button>
-  <button *ngIf="sucursalSeleccionada" 
-          mat-raised-button 
-          color="primary" 
-          (click)="recargarProductos()" 
-          [disabled]="cargandoProductos">
-    <mat-icon>refresh</mat-icon>
-    Actualizar Productos
-  </button>
 </div>
