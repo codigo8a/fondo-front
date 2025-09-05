@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Cliente } from './interfaces/cliente.interface';
 import { ClienteComponent } from './components/cliente/cliente.component';
 import { InscripcionesComponent } from './components/inscripciones/inscripciones.component';
+import { LogComponent } from './components/log/log.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,7 +16,8 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
     MatToolbarModule,
     MatButtonModule,
     ClienteComponent,
-    InscripcionesComponent
+    InscripcionesComponent,
+    LogComponent
   ],
   template: `
     <mat-toolbar color="primary">
@@ -25,11 +27,19 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
     <div class="dashboard-container">     
       <div class="components-container">
         <div class="component-left">
-          <app-cliente 
-            #clienteComponent
-            [clienteId]="clienteIdAleatorio"
-            (inscripcionCreada)="onInscripcionCreada()">
-          </app-cliente>
+          <div class="left-row cliente-row">
+            <app-cliente 
+              #clienteComponent
+              [clienteId]="clienteIdAleatorio"
+              (inscripcionCreada)="onInscripcionCreada()">
+            </app-cliente>
+          </div>
+          
+          <div class="left-row log-row">
+            <app-log 
+              [clienteId]="clienteIdAleatorio">
+            </app-log>
+          </div>
         </div>
         
         <div class="component-right">
@@ -82,7 +92,16 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       min-height: 0;
     }
     
-    .component-left,
+    .component-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: calc(50% - 10px);
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    
     .component-right {
       flex: 1;
       display: flex;
@@ -92,7 +111,24 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       box-sizing: border-box;
     }
     
-    .component-left app-cliente,
+    .left-row {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      min-height: 0;
+      box-sizing: border-box;
+    }
+    
+    .cliente-row {
+      min-height: 300px;
+    }
+    
+    .log-row {
+      min-height: 200px;
+    }
+    
+    .left-row app-cliente,
+    .left-row app-log,
     .component-right app-inscripciones {
       width: 100%;
       height: 100%;

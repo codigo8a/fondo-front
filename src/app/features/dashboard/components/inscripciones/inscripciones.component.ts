@@ -49,6 +49,7 @@ class InscripcionValidator {
 export class InscripcionesComponent implements OnInit, OnChanges {
   @Input() clienteId: string = '';
   @Output() clienteActualizado = new EventEmitter<void>();
+  @Output() logActualizado = new EventEmitter<void>();
   
   // Inyección de dependencias (DIP)
   private readonly inscripcionService = inject(InscripcionService);
@@ -189,6 +190,7 @@ export class InscripcionesComponent implements OnInit, OnChanges {
                 next: () => {
                   // Emitir evento para actualizar la vista del cliente
                   this.clienteActualizado.emit();
+                  this.logActualizado.emit();
                   
                   // Mostrar mensaje de éxito
                   this.alertDialogService.openSuccessAlert(

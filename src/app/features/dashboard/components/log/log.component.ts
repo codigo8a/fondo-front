@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { LogService } from './services/log.service';
-import { Log, LogState } from './interfaces/log.interfaces';
+import { Log, LogState, LogResponse } from './interfaces/log.interfaces';
 
 @Component({
   selector: 'app-log',
@@ -47,28 +47,24 @@ export class LogComponent implements OnInit, OnChanges {
   }
 
   cargarLogs(): void {
-    if (!this.clienteId) return;
-
-    this.state.cargando = true;
-    this.state.error = null;
-    this.cdr.detectChanges();
-
-    this.logService.obtenerLogsPorCliente(this.clienteId).subscribe({
-      next: (logs) => {
-        // Ordenar por fecha más reciente y tomar solo los últimos 4
-        this.state.logs = logs
-          .sort((a, b) => new Date(b.fechaMovimiento).getTime() - new Date(a.fechaMovimiento).getTime())
-          .slice(0, 4);
-        this.state.cargando = false;
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error al cargar logs:', error);
-        this.state.error = 'Error al cargar el historial de operaciones';
-        this.state.cargando = false;
-        this.cdr.detectChanges();
-      }
-    });
+    if (this.clienteId) {
+      this.state.cargando = true;
+      this.state.error = null;
+      
+      this.logService.obtenerLogsPorCliente(this.clienteId).subscribe({
+        next: (logs: Log[]) => {
+          this.state.logs = logs.slice(-4);
+          this.state.cargando = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar logs:', error);
+          this.state.error = 'Error al cargar el historial';
+          this.state.cargando = false;
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
 
   obtenerIconoOperacion(tipoOperacion: string): string {
