@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ClienteService } from '../../services/cliente.service';
 import { Cliente } from '../../interfaces/cliente.interface';
+import { SucursalesComponent } from '../sucursales/sucursales.component';
 
 // Interface para el estado del componente (ISP)
 interface ClienteComponentState {
@@ -26,73 +27,6 @@ class ClienteValidator {
   }
 }
 
-// Componente del modal de ejemplo
-@Component({
-  selector: 'app-modal-ejemplo',
-  standalone: true,
-  imports: [CommonModule, MatButtonModule, MatDialogModule, MatIconModule],
-  template: `
-    <div class="modal-header">
-      <h2 mat-dialog-title>
-        <mat-icon>info</mat-icon>
-        Modal de Ejemplo
-      </h2>
-    </div>
-    <div mat-dialog-content class="modal-content">
-      <p>Este es un modal genérico de ejemplo.</p>
-      <p>Aquí puedes agregar cualquier contenido que necesites mostrar.</p>
-      <div class="ejemplo-info">
-        <mat-icon>lightbulb</mat-icon>
-        <span>Este modal se puede personalizar según tus necesidades.</span>
-      </div>
-    </div>
-    <div mat-dialog-actions class="modal-actions">
-      <button mat-button mat-dialog-close>Cerrar</button>
-      <button mat-raised-button color="primary" mat-dialog-close>Aceptar</button>
-    </div>
-  `,
-  styles: [`
-    .modal-header {
-      padding: 20px 24px 0;
-    }
-    
-    .modal-header h2 {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0;
-      color: #1976d2;
-    }
-    
-    .modal-content {
-      padding: 20px 24px;
-      min-width: 300px;
-    }
-    
-    .ejemplo-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background-color: #f5f5f5;
-      padding: 12px;
-      border-radius: 4px;
-      margin-top: 16px;
-    }
-    
-    .ejemplo-info mat-icon {
-      color: #ff9800;
-    }
-    
-    .modal-actions {
-      padding: 8px 24px 20px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-  `]
-})
-export class ModalEjemploComponent {}
-
 @Component({
   selector: 'app-cliente',
   standalone: true,
@@ -100,7 +34,7 @@ export class ModalEjemploComponent {}
     CommonModule, 
     MatCardModule, 
     MatProgressSpinnerModule, 
-    MatIconModule,
+    MatIconModule, 
     MatChipsModule,
     MatButtonModule,
     MatDialogModule
@@ -111,12 +45,11 @@ export class ModalEjemploComponent {}
 export class ClienteComponent implements OnInit, OnChanges {
   @Input() clienteId: string = '';
   
-  // Inyección de dependencias (DIP)
   private readonly clienteService = inject(ClienteService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly dialog = inject(MatDialog);
-  
-  // Estado del componente
+
+  // Estado del componente usando la interface (ISP)
   state: ClienteComponentState = {
     cliente: null,
     cargando: false,
@@ -196,16 +129,16 @@ export class ClienteComponent implements OnInit, OnChanges {
     });
   }
 
-  // Método para abrir el modal (SRP)
+  // Método para abrir el modal de sucursales (SRP)
   abrirModal(): void {
-    const dialogRef = this.dialog.open(ModalEjemploComponent, {
-      width: '400px',
+    const dialogRef = this.dialog.open(SucursalesComponent, {
+      width: '600px',
       disableClose: false,
       autoFocus: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Modal cerrado:', result);
+      console.log('Modal de sucursales cerrado:', result);
     });
   }
 }

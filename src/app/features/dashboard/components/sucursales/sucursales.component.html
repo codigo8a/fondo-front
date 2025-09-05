@@ -1,0 +1,48 @@
+<div class="modal-header">
+  <h2 mat-dialog-title>
+    <mat-icon>business</mat-icon>
+    Sucursales
+  </h2>
+</div>
+
+<div mat-dialog-content class="modal-content">
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando sucursales...</p>
+  </div>
+  
+  <div *ngIf="error && !cargando" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>Error al cargar las sucursales</p>
+    <button mat-button color="primary" (click)="recargarSucursales()">
+      <mat-icon>refresh</mat-icon>
+      Reintentar
+    </button>
+  </div>
+  
+  <div *ngIf="!cargando && !error && sucursales.length > 0" class="sucursales-container">
+    <div *ngFor="let sucursal of sucursales" class="sucursal-item">
+      <div class="sucursal-header">
+        <h3>{{ sucursal.nombre }}</h3>
+        <mat-icon>location_on</mat-icon>
+      </div>
+      <div class="sucursal-info">
+        <p><strong>ID:</strong> {{ sucursal.id }}</p>
+        <p><strong>Ciudad:</strong> {{ sucursal.ciudad }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="!cargando && !error && sucursales.length === 0" class="no-data">
+    <mat-icon>info</mat-icon>
+    <p>No se encontraron sucursales</p>
+  </div>
+</div>
+
+<div mat-dialog-actions class="modal-actions">
+  <button mat-button mat-dialog-close>Cerrar</button>
+  <button mat-raised-button color="primary" (click)="recargarSucursales()" [disabled]="cargando">
+    <mat-icon>refresh</mat-icon>
+    Actualizar
+  </button>
+</div>
