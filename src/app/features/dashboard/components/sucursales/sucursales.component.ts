@@ -2,7 +2,7 @@ import { Component, inject, OnInit, ChangeDetectorRef, Inject } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +12,8 @@ import { HttpClient } from '@angular/common/http';
 import { Sucursal } from '../../interfaces/sucursal.interface';
 import { Producto } from '../../interfaces/producto.interface';
 import { InscripcionRequest } from '../../interfaces/inscripcion.interface';
+import { AlertDialogComponent } from '../alert-dialog/alert-dialog.component';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-sucursales',
@@ -25,7 +27,8 @@ import { InscripcionRequest } from '../../interfaces/inscripcion.interface';
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSnackBarModule
   ],
   templateUrl: './sucursales.component.html',
   styleUrls: ['./sucursales.component.scss']
@@ -34,6 +37,8 @@ export class SucursalesComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly dialogRef = inject(MatDialogRef<SucursalesComponent>);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
   
   clienteId: string = '';
   sucursales: Sucursal[] = [];
@@ -146,12 +151,43 @@ export class SucursalesComponent implements OnInit {
       .subscribe({
         next: (response) => {
           console.log('Inscripción exitosa:', response);
+          
+          // Mostrar alerta de éxito
+          this.dialog.open(AlertDialogComponent, {
+            data: {
+              title: 'Inscripción Exitosa',
+              message: 'La inscripción se ha realizado correctamente.',
+              type: 'success'
+            },
+            width: '400px',
+            disableClose: false
+          });
+          
           // Cerrar el modal y enviar el resultado
           this.dialogRef.close({ success: true, data: response });
         },
         error: (error) => {
           console.error('Error al crear inscripción:', error);
-          // Aquí puedes mostrar un mensaje de error al usuario
+          
+          let title = 'Error';
+          let message = 'Error al procesar la inscripción. Intente nuevamente.';
+          
+          // Manejar error específico de inscripción duplicada
+          if (error.status === 400 && error.error?.error) {
+            title = 'Inscripción Duplicada';
+            message = error.error.error;
+          }
+          
+          // Mostrar alerta de error
+          this.dialog.open(AlertDialogComponent, {
+            data: {
+              title: title,
+              message: message,
+              type: 'error'
+            },
+            width: '400px',
+            disableClose: false
+          });
         }
       });
   }
