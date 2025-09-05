@@ -89,16 +89,12 @@ class InscripcionValidator {
                     <div class="detail-row monto">
                       <mat-icon>attach_money</mat-icon>
                       <span><strong>Monto Invertido:</strong> 
-                        <span class="monto-value">{{ inscripcion.montoInvertido | currency:'USD':'symbol':'1.2-2' }}</span>
+                        <span class="monto-value">{{ inscripcion.montoInvertido | currency:'COL':'symbol':'1.2-2' }}</span>
                       </span>
                     </div>
                     <div class="detail-row">
                       <mat-icon>schedule</mat-icon>
                       <span><strong>Fecha:</strong> {{ inscripcion.fechaTransaccion | date:'dd/MM/yyyy HH:mm' }}</span>
-                    </div>
-                    <div class="detail-row">
-                      <mat-icon>trending_up</mat-icon>
-                      <span><strong>Monto Mínimo:</strong> {{ inscripcion.producto.montoMinimo | currency:'USD':'symbol':'1.2-0' }}</span>
                     </div>
                   </div>
                 </mat-card-content>
