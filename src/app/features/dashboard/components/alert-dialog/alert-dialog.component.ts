@@ -23,7 +23,8 @@ export class AlertDialogComponent implements IAlertDialogActions, IAlertDialogPr
     @Inject(MAT_DIALOG_DATA) public data: IAlertDialogData,
     private alertPresentationService: AlertPresentationService
   ) {
-    console.log('AlertDialogComponent data:', this.data);
+    // En la línea 26, eliminar:
+    // console.log('AlertDialogComponent data:', this.data);
   }
 
   close(): void {

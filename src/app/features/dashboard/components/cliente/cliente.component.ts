@@ -78,8 +78,14 @@ export class ClienteComponent implements OnInit, OnChanges {
       this.resetearEstados();
       this.actualizarEstadoBoton();
       
-      if (this.clienteId && this.clienteId.trim() !== '') {
-        this.validarYCargarCliente();
+      // Usar currentValue del change para asegurar que tenemos el valor más reciente
+      const nuevoClienteId = changes['clienteId'].currentValue;
+      
+      if (nuevoClienteId && nuevoClienteId.trim() !== '') {
+        // Forzar la actualización en el siguiente ciclo
+        setTimeout(() => {
+          this.validarYCargarCliente();
+        }, 0);
       }
     }
   }
@@ -168,8 +174,6 @@ export class ClienteComponent implements OnInit, OnChanges {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Modal de sucursales cerrado:', result);
-      
       if (result && result.success) {
         // Si la inscripción fue exitosa, emitir AMBOS eventos
         this.inscripcionCreada.emit();
