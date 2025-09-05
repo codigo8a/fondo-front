@@ -148,13 +148,14 @@ export class InscripcionesComponent implements OnInit, OnChanges {
   // Método para eliminar inscripción con confirmación
   eliminarInscripcion(inscripcionId: string): void {
     const inscripcion = this.state.inscripciones.find(i => i.id === inscripcionId);
-    const nombreProducto = inscripcion?.producto.nombre || 'esta inscripción';
-    
+    if (!inscripcion) return;
+
+    const nombreProducto = inscripcion.producto?.nombre || 'producto desconocido';
     this.alertDialogService.openConfirmDialog(
-      'Confirmar eliminación',
-      `¿Está seguro de que desea eliminar la inscripción del producto "${nombreProducto}"? Esta acción no se puede deshacer.`,
-      'Eliminar',
-      'Cancelar'
+      'Cancelar Inscripción',
+      `¿Está seguro de que desea cancelar la inscripción del fondo "${nombreProducto}"? Esta acción no se puede deshacer.`,
+      'Cancelar',
+      'No cancelar'
     ).subscribe(confirmed => {
       if (confirmed) {
         this.ejecutarEliminacion(inscripcionId);
