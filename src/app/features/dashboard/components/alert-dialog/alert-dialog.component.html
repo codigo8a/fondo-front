@@ -1,0 +1,16 @@
+<div class="alert-dialog" [ngClass]="'alert-' + (data?.type || 'info')">
+  <div class="alert-header">
+    <div class="icon-container">
+      <mat-icon class="alert-icon">{{ getIcon() }}</mat-icon>
+    </div>
+    <h2 mat-dialog-title>{{ data?.title || 'Alerta' }}</h2>
+  </div>
+  <div mat-dialog-content class="alert-content">
+    <p>{{ data?.message || 'Sin mensaje disponible' }}</p>
+  </div>
+  <div mat-dialog-actions class="alert-actions">
+    <button mat-raised-button [color]="getButtonColor()" (click)="close()" class="action-button">
+      Aceptar
+    </button>
+  </div>
+</div>
