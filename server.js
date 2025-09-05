@@ -1,34 +1,23 @@
 const express = require('express');
-const { ngExpressEngine } = require('@nguniversal/express-engine');
 const { APP_BASE_HREF } = require('@angular/common');
 const { existsSync } = require('fs');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const DIST_FOLDER = path.join(process.cwd(), 'dist');
+const DIST_FOLDER = path.join(process.cwd(), 'dist', 'fondo-front');
 
-// The Express server
-const bootstrap = require('./dist/fondo-front/server/server.mjs');
+// Import the SSR app
+const { app: ssrApp } = require('./dist/fondo-front/server/server.mjs');
 
-// Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
-app.engine('html', ngExpressEngine({
-  bootstrap: bootstrap.default,
-}));
-
-app.set('view engine', 'html');
-app.set('views', path.join(DIST_FOLDER, 'fondo-front/browser'));
-
-// Example Express Rest API endpoints
-// app.get('/api/**', (req, res) => { });
 // Serve static files from /browser
-app.get('*.*', express.static(path.join(DIST_FOLDER, 'fondo-front/browser'), {
+app.get('*.*', express.static(path.join(DIST_FOLDER, 'browser'), {
   maxAge: '1y'
 }));
 
-// All regular routes use the Universal engine
+// All regular routes use the SSR app
 app.get('*', (req, res) => {
-  res.render('index', { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] });
+  ssrApp(req, res);
 });
 
 // Start up the Node server
