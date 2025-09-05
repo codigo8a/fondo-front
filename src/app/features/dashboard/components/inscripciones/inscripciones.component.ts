@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { InscripcionService } from '../../services/inscripcion.service';
+import { ClienteService } from '../../services/cliente.service';
 import { Inscripcion } from '../../interfaces/inscripcion.interface';
 import { AlertDialogService } from '../alert-dialog/services/alert-dialog.service';
 
@@ -47,9 +48,11 @@ class InscripcionValidator {
 })
 export class InscripcionesComponent implements OnInit, OnChanges {
   @Input() clienteId: string = '';
+  @Output() clienteActualizado = new EventEmitter<void>();
   
   // Inyección de dependencias (DIP)
   private readonly inscripcionService = inject(InscripcionService);
+  private readonly clienteService = inject(ClienteService);
   private readonly alertDialogService = inject(AlertDialogService);
   private readonly cdr = inject(ChangeDetectorRef);
   
@@ -161,6 +164,9 @@ export class InscripcionesComponent implements OnInit, OnChanges {
 
   // Método privado para ejecutar la eliminación
   private ejecutarEliminacion(inscripcionId: string): void {
+    const inscripcion = this.state.inscripciones.find(i => i.id === inscripcionId);
+    const montoInvertido = inscripcion?.montoInvertido || 0;
+    
     this.state.eliminando = inscripcionId;
     this.cdr.detectChanges();
 
@@ -173,11 +179,48 @@ export class InscripcionesComponent implements OnInit, OnChanges {
         this.state.eliminando = null;
         this.cdr.detectChanges();
         
-        // Mostrar mensaje de éxito
-        this.alertDialogService.openSuccessAlert(
-          'Eliminación exitosa',
-          'La inscripción ha sido eliminada correctamente.'
-        );
+        // Actualizar el monto del cliente sumando el monto invertido
+        if (this.clienteId && montoInvertido > 0) {
+          this.clienteService.obtenerClientePorId(this.clienteId).subscribe({
+            next: (cliente) => {
+              const nuevoMonto = cliente.monto + montoInvertido;
+              this.clienteService.actualizarMonto(this.clienteId, nuevoMonto).subscribe({
+                next: () => {
+                  // Emitir evento para actualizar la vista del cliente
+                  this.clienteActualizado.emit();
+                  
+                  // Mostrar mensaje de éxito
+                  this.alertDialogService.openSuccessAlert(
+                    'Eliminación exitosa',
+                    `La inscripción ha sido eliminada correctamente y se han devuelto $${montoInvertido.toLocaleString()} a su cuenta.`
+                  );
+                },
+                error: (error) => {
+                  console.error('Error al actualizar monto del cliente:', error);
+                  // Mostrar mensaje de éxito pero con advertencia sobre el monto
+                  this.alertDialogService.openSuccessAlert(
+                    'Inscripción eliminada',
+                    'La inscripción ha sido eliminada, pero hubo un problema al actualizar su saldo. Contacte al administrador.'
+                  );
+                }
+              });
+            },
+            error: (error) => {
+              console.error('Error al obtener datos del cliente:', error);
+              // Mostrar mensaje de éxito básico
+              this.alertDialogService.openSuccessAlert(
+                'Eliminación exitosa',
+                'La inscripción ha sido eliminada correctamente.'
+              );
+            }
+          });
+        } else {
+          // Mostrar mensaje de éxito básico si no hay monto a devolver
+          this.alertDialogService.openSuccessAlert(
+            'Eliminación exitosa',
+            'La inscripción ha sido eliminada correctamente.'
+          );
+        }
       },
       error: (error) => {
         console.error('Error al eliminar inscripción:', error);

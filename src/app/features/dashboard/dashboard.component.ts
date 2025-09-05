@@ -26,6 +26,7 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
       <div class="components-container">
         <div class="component-left">
           <app-cliente 
+            #clienteComponent
             [clienteId]="clienteIdAleatorio"
             (inscripcionCreada)="onInscripcionCreada()">
           </app-cliente>
@@ -34,7 +35,8 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
         <div class="component-right">
           <app-inscripciones 
             #inscripcionesComponent
-            [clienteId]="clienteIdAleatorio">
+            [clienteId]="clienteIdAleatorio"
+            (clienteActualizado)="onClienteActualizado()">
           </app-inscripciones>
         </div>
       </div>
@@ -116,6 +118,7 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
 })
 export class DashboardComponent {
   @ViewChild('inscripcionesComponent') inscripcionesComponent!: InscripcionesComponent;
+  @ViewChild('clienteComponent') clienteComponent!: ClienteComponent;
   
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -175,6 +178,13 @@ export class DashboardComponent {
     // Recargar las inscripciones cuando se crea una nueva
     if (this.inscripcionesComponent) {
       this.inscripcionesComponent.recargarInscripciones();
+    }
+  }
+  
+  onClienteActualizado(): void {
+    // Recargar los datos del cliente cuando se actualiza el monto
+    if (this.clienteComponent) {
+      this.clienteComponent.cargarCliente();
     }
   }
 }

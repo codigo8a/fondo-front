@@ -122,12 +122,24 @@ export class ClienteComponent implements OnInit, OnChanges {
   }
 
   // Método para cargar datos del cliente (SRP)
-  private cargarCliente(): void {
+  // Cambiar de private a public para que pueda ser llamado desde el dashboard
+  public cargarCliente(): void {
+    if (!this.clienteId) {
+      this.resetearEstados();
+      return;
+    }
+
+    this.state.esIdMongoValido = ClienteValidator.validarIdMongo(this.clienteId);
+    
+    if (!this.state.esIdMongoValido) {
+      this.resetearEstados();
+      return;
+    }
+
     this.state.cargando = true;
     this.state.error = false;
-    this.state.cliente = null;
     this.cdr.detectChanges();
-    
+
     this.clienteService.obtenerClientePorId(this.clienteId).subscribe({
       next: (cliente) => {
         this.state.cliente = cliente;
@@ -136,7 +148,7 @@ export class ClienteComponent implements OnInit, OnChanges {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error al obtener cliente:', error);
+        console.error('Error al cargar cliente:', error);
         this.state.cliente = null;
         this.state.error = true;
         this.state.cargando = false;
