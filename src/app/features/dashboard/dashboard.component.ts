@@ -112,10 +112,14 @@ export class DashboardComponent {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   
-  clienteIdAleatorio: string = 'HOLA';
+  clienteIdAleatorio: string = '';
   private readonly idsUtilizados: Set<string> = new Set();
 
   obtenerClienteAleatorio(): void {
+    // Primero establecer un valor temporal para forzar detección de cambios
+    this.clienteIdAleatorio = 'loading...';
+    this.cdr.detectChanges();
+    
     this.http.get<Cliente[]>('http://localhost:8080/api/clientes')
       .subscribe({
         next: (clientes) => {
@@ -147,7 +151,7 @@ export class DashboardComponent {
         },
         error: (error) => {
           console.error('Error al obtener clientes:', error);
-          this.clienteIdAleatorio = 'Error al cargar';
+          this.clienteIdAleatorio = 'error';
           this.cdr.detectChanges();
         }
       });
@@ -155,7 +159,7 @@ export class DashboardComponent {
   
   reiniciarHistorial(): void {
     this.idsUtilizados.clear();
-    this.clienteIdAleatorio = 'HOLA';
+    this.clienteIdAleatorio = '';
     this.cdr.detectChanges();
   }
 }
