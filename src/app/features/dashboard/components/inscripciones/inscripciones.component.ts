@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
 import { InscripcionService } from '../../services/inscripcion.service';
 import { Inscripcion } from '../../interfaces/inscripcion.interface';
 
@@ -15,6 +16,7 @@ interface InscripcionesComponentState {
   cargando: boolean;
   error: boolean;
   esIdMongoValido: boolean;
+  eliminando: string | null; // ID de la inscripción que se está eliminando
 }
 
 // Clase para validación (SRP)
@@ -36,7 +38,8 @@ class InscripcionValidator {
     MatIconModule,
     MatChipsModule,
     MatDividerModule,
-    MatListModule
+    MatListModule,
+    MatButtonModule
   ],
   templateUrl: './inscripciones.component.html',
   styleUrls: ['./inscripciones.component.scss']
@@ -53,7 +56,8 @@ export class InscripcionesComponent implements OnInit, OnChanges {
     inscripciones: [],
     cargando: false,
     error: false,
-    esIdMongoValido: true
+    esIdMongoValido: true,
+    eliminando: null
   };
 
   ngOnInit(): void {
@@ -78,7 +82,8 @@ export class InscripcionesComponent implements OnInit, OnChanges {
       inscripciones: [],
       cargando: false,
       error: false,
-      esIdMongoValido: true
+      esIdMongoValido: true,
+      eliminando: null
     };
     this.cdr.detectChanges();
   }
@@ -133,5 +138,36 @@ export class InscripcionesComponent implements OnInit, OnChanges {
     if (this.clienteId && this.state.esIdMongoValido) {
       this.cargarInscripciones();
     }
+  }
+
+  // Método para eliminar inscripción
+  eliminarInscripcion(inscripcionId: string): void {
+    if (confirm('¿Está seguro de que desea eliminar esta inscripción?')) {
+      this.state.eliminando = inscripcionId;
+      this.cdr.detectChanges();
+
+      this.inscripcionService.eliminarInscripcion(inscripcionId).subscribe({
+        next: () => {
+          // Remover la inscripción del array local
+          this.state.inscripciones = this.state.inscripciones.filter(
+            inscripcion => inscripcion.id !== inscripcionId
+          );
+          this.state.eliminando = null;
+          this.cdr.detectChanges();
+          console.log('Inscripción eliminada exitosamente');
+        },
+        error: (error) => {
+          console.error('Error al eliminar inscripción:', error);
+          this.state.eliminando = null;
+          this.cdr.detectChanges();
+          alert('Error al eliminar la inscripción. Por favor, inténtelo de nuevo.');
+        }
+      });
+    }
+  }
+
+  // Método para verificar si una inscripción se está eliminando
+  estaEliminando(inscripcionId: string): boolean {
+    return this.state.eliminando === inscripcionId;
   }
 }

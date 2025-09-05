@@ -24,7 +24,7 @@
     } @else if (state.inscripciones.length > 0) {
       <div class="inscripciones-list">
         @for (inscripcion of state.inscripciones; track inscripcion.id) {
-          <mat-card class="inscripcion-item">
+          <mat-card class="inscripcion-item" [class.deleting]="estaEliminando(inscripcion.id)">
             <mat-card-header>
               <mat-card-title class="producto-header">
                 <span class="producto-nombre">
@@ -57,6 +57,26 @@
                 </div>
               </div>
             </mat-card-content>
+            <mat-card-actions>
+              <button 
+                mat-raised-button 
+                class="delete-button"
+                [disabled]="estaEliminando(inscripcion.id)"
+                (click)="eliminarInscripcion(inscripcion.id)"
+                [attr.aria-label]="'Eliminar inscripción de ' + inscripcion.producto.nombre">
+                @if (estaEliminando(inscripcion.id)) {
+                  <div class="loading-content">
+                    <mat-spinner diameter="16"></mat-spinner>
+                    <span class="loading-text">Eliminando...</span>
+                  </div>
+                } @else {
+                  <div class="button-content">
+                    <mat-icon>delete</mat-icon>
+                    <span class="button-text">Eliminar</span>
+                  </div>
+                }
+              </button>
+            </mat-card-actions>
           </mat-card>
           @if (!$last) {
             <mat-divider></mat-divider>
