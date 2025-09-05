@@ -371,4 +371,11 @@ export class InscripcionesComponent implements OnInit, OnChanges {
       }
     });
   }
+  
+  // Método público para recargar inscripciones desde componente padre
+  public recargarInscripciones(): void {
+    if (this.clienteId && this.state.esIdMongoValido) {
+      this.cargarInscripciones();
+    }
+  }
 }

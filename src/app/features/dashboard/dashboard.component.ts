@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,11 +25,17 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
     <div class="dashboard-container">     
       <div class="components-container">
         <div class="component-left">
-          <app-cliente [clienteId]="clienteIdAleatorio"></app-cliente>
+          <app-cliente 
+            [clienteId]="clienteIdAleatorio"
+            (inscripcionCreada)="onInscripcionCreada()">
+          </app-cliente>
         </div>
         
         <div class="component-right">
-          <app-inscripciones [clienteId]="clienteIdAleatorio"></app-inscripciones>
+          <app-inscripciones 
+            #inscripcionesComponent
+            [clienteId]="clienteIdAleatorio">
+          </app-inscripciones>
         </div>
       </div>
       
@@ -109,6 +115,8 @@ import { InscripcionesComponent } from './components/inscripciones/inscripciones
   `]
 })
 export class DashboardComponent {
+  @ViewChild('inscripcionesComponent') inscripcionesComponent!: InscripcionesComponent;
+  
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   
@@ -161,5 +169,12 @@ export class DashboardComponent {
     this.idsUtilizados.clear();
     this.clienteIdAleatorio = '';
     this.cdr.detectChanges();
+  }
+  
+  onInscripcionCreada(): void {
+    // Recargar las inscripciones cuando se crea una nueva
+    if (this.inscripcionesComponent) {
+      this.inscripcionesComponent.recargarInscripciones();
+    }
   }
 }

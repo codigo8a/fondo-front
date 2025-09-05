@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -44,6 +44,7 @@ class ClienteValidator {
 })
 export class ClienteComponent implements OnInit, OnChanges {
   @Input() clienteId: string = '';
+  @Output() inscripcionCreada = new EventEmitter<void>();
   
   private readonly clienteService = inject(ClienteService);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -149,11 +150,16 @@ export class ClienteComponent implements OnInit, OnChanges {
     const dialogRef = this.dialog.open(SucursalesComponent, {
       width: '600px',
       disableClose: false,
-      autoFocus: true
+      autoFocus: true,
+      data: { clienteId: this.clienteId }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('Modal de sucursales cerrado:', result);
+      // Si la inscripción fue exitosa, emitir evento para recargar inscripciones
+      if (result && result.success) {
+        this.inscripcionCreada.emit();
+      }
     });
   }
 }

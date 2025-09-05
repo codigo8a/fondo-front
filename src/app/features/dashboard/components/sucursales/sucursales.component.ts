@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { HttpClient } from '@angular/common/http';
 import { Sucursal } from '../../interfaces/sucursal.interface';
 import { Producto } from '../../interfaces/producto.interface';
+import { InscripcionRequest } from '../../interfaces/inscripcion.interface';
 
 @Component({
   selector: 'app-sucursales',
@@ -32,7 +33,9 @@ import { Producto } from '../../interfaces/producto.interface';
 export class SucursalesComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly dialogRef = inject(MatDialogRef<SucursalesComponent>);
   
+  clienteId: string = '';
   sucursales: Sucursal[] = [];
   productos: Producto[] = [];
   sucursalSeleccionada: Sucursal | null = null;
@@ -42,6 +45,10 @@ export class SucursalesComponent implements OnInit {
   errorProductos: boolean = false;
   montosInversion: (number | string | null)[] = [];
 
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { clienteId: string }) {
+    this.clienteId = data?.clienteId || '';
+  }
+  
   ngOnInit(): void {
     this.cargarSucursales();
   }
@@ -120,9 +127,33 @@ export class SucursalesComponent implements OnInit {
       return;
     }
     
-    console.log('Invirtiendo en producto:', producto.nombre, 'Monto:', montoNumerico);
-    // Aquí puedes agregar la lógica para procesar la inversión
-    // Por ejemplo, llamar a un endpoint de inversión
+    if (!this.clienteId || !this.sucursalSeleccionada) {
+      console.error('Faltan datos requeridos: clienteId o sucursal seleccionada');
+      return;
+    }
+
+    const inscripcionRequest: InscripcionRequest = {
+      idCliente: this.clienteId,
+      idProducto: producto.id,
+      idSucursal: this.sucursalSeleccionada.id,
+      montoInvertido: montoNumerico,
+      fechaTransaccion: new Date().toISOString()
+    };
+
+    console.log('Enviando inscripción:', inscripcionRequest);
+
+    this.http.post('http://localhost:8080/api/inscripcion', inscripcionRequest)
+      .subscribe({
+        next: (response) => {
+          console.log('Inscripción exitosa:', response);
+          // Cerrar el modal y enviar el resultado
+          this.dialogRef.close({ success: true, data: response });
+        },
+        error: (error) => {
+          console.error('Error al crear inscripción:', error);
+          // Aquí puedes mostrar un mensaje de error al usuario
+        }
+      });
   }
   
   // Método para convertir string a number

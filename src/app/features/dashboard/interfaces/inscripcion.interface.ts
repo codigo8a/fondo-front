@@ -9,3 +9,12 @@ export interface Inscripcion {
   montoInvertido: number;
   fechaTransaccion: string;
 }
+
+// Nueva interfaz para la petición POST
+export interface InscripcionRequest {
+  idCliente: string;
+  idProducto: string;
+  idSucursal: string;
+  montoInvertido: number;
+  fechaTransaccion: string;
+}
