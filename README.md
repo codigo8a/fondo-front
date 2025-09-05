@@ -65,28 +65,6 @@ npm run watch
 npm run serve:ssr:fondo-front
 ```
 
-## 🌐 Despliegue en Heroku
-
-### Configuración Automática
-
-El proyecto está configurado para despliegue automático en Heroku:
-
-1. **Variables de entorno requeridas**:
-   ```bash
-   NODE_ENV=production
-   ```
-
-2. **Comandos de despliegue**:
-   ```bash
-   # Preparar para despliegue
-   npm run build
-   
-   # Commit y push
-   git add .
-   git commit -m "Deploy to production"
-   git push heroku main
-   ```
-
 ### Archivos de Configuración
 
 - **Procfile**: Define el comando de inicio para Heroku
