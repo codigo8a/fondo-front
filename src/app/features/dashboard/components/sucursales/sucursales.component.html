@@ -3,9 +3,6 @@
     <mat-icon>{{ sucursalSeleccionada ? 'inventory' : 'business' }}</mat-icon>
     {{ sucursalSeleccionada ? 'Productos de ' + sucursalSeleccionada.nombre : 'Sucursales' }}
   </h2>
-  <button *ngIf="sucursalSeleccionada" mat-icon-button (click)="volverASucursales()" class="back-button">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
 </div>
 
 <div mat-dialog-content class="modal-content">
@@ -96,6 +93,15 @@
 </div>
 
 <div mat-dialog-actions class="modal-actions">
+  <button *ngIf="sucursalSeleccionada" 
+          mat-button 
+          (click)="volverASucursales()" 
+          class="back-button-footer"
+          matTooltip="Volver a sucursales">
+    <mat-icon>arrow_back</mat-icon>
+    Atrás
+  </button>
+  <div class="spacer"></div>
   <button mat-button mat-dialog-close>Cerrar</button>
   <button *ngIf="!sucursalSeleccionada" 
           mat-raised-button 

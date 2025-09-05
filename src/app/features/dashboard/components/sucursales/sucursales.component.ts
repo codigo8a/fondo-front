@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { HttpClient } from '@angular/common/http';
 import { Sucursal } from '../../interfaces/sucursal.interface';
 import { Producto } from '../../interfaces/producto.interface';
@@ -16,7 +17,8 @@ import { Producto } from '../../interfaces/producto.interface';
     MatButtonModule, 
     MatDialogModule, 
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ],
   templateUrl: './sucursales.component.html',
   styleUrls: ['./sucursales.component.scss']
