@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 4000;
 const DIST_FOLDER = path.join(process.cwd(), 'dist', 'fondo-front');
 
 // Serve static files from /browser
-app.get('*.*', express.static(path.join(DIST_FOLDER, 'browser'), {
+app.use(express.static(path.join(DIST_FOLDER, 'browser'), {
   maxAge: '1y'
 }));
 
@@ -23,7 +23,6 @@ try {
   });
 }
 
-// Start up the Node server
 app.listen(PORT, () => {
-  console.log(`Node Express server listening on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
