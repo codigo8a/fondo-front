@@ -87,7 +87,7 @@ import { LogComponent } from './components/log/log.component';
     
     .components-container {
       display: flex;
-      gap: 20px;
+      gap: 10px; // Reducido de 20px a 10px
       margin-bottom: 20px;
       flex: 1;
       width: 100%;
@@ -99,7 +99,7 @@ import { LogComponent } from './components/log/log.component';
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 8px; // Reducido aún más
       width: calc(50% - 10px);
       min-width: 0;
       box-sizing: border-box;
@@ -115,19 +115,20 @@ import { LogComponent } from './components/log/log.component';
     }
     
     .left-row {
-      flex: 1;
+      flex: none; // Cambiado de flex: 1 a flex: none
       display: flex;
       align-items: flex-start;
-      min-height: 0;
+      min-height: 0; // Eliminado min-height fijo
       box-sizing: border-box;
     }
     
     .cliente-row {
-      min-height: 300px;
+      height: auto; // Cambiado de min-height: 300px a height: auto
+      margin-bottom: 4px; // Pequeño margen para separación
     }
     
     .log-row {
-      min-height: 200px;
+      height: auto; // Cambiado de min-height: 200px a height: auto
     }
     
     .left-row app-cliente,
