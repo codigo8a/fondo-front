@@ -156,9 +156,19 @@ export class ClienteComponent implements OnInit, OnChanges {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('Modal de sucursales cerrado:', result);
-      // Si la inscripción fue exitosa, emitir evento para recargar inscripciones
+      
       if (result && result.success) {
+        // Si la inscripción fue exitosa, emitir evento para recargar inscripciones
         this.inscripcionCreada.emit();
+        
+        // Si se recibió el cliente actualizado, actualizar los datos locales
+        if (result.clienteActualizado) {
+          this.state.cliente = result.clienteActualizado;
+          this.cdr.detectChanges();
+        } else {
+          // Si no se recibió el cliente actualizado, recargar desde el servidor
+          this.cargarCliente();
+        }
       }
     });
   }

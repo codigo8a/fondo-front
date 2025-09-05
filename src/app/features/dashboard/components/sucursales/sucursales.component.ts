@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,7 @@ import { Producto } from '../../interfaces/producto.interface';
 import { InscripcionRequest } from '../../interfaces/inscripcion.interface';
 import { AlertDialogComponent } from '../alert-dialog/alert-dialog.component';
 import { ClienteService } from '../../services/cliente.service';
+import { InscripcionService } from '../../services/inscripcion.service';
 import { Cliente } from '../../interfaces/cliente.interface';
 
 @Component({
@@ -29,7 +30,6 @@ import { Cliente } from '../../interfaces/cliente.interface';
     MatInputModule,
     MatProgressSpinnerModule,
     MatTooltipModule
-    // Remover MatSnackBarModule si no se usa en otro lugar
   ],
   templateUrl: './sucursales.component.html',
   styleUrls: ['./sucursales.component.scss']
@@ -38,10 +38,10 @@ export class SucursalesComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly dialogRef = inject(MatDialogRef<SucursalesComponent>);
-  private readonly dialog = inject(MatDialog);
-  // Remover esta línea si no se usa en otro lugar:
-  // private readonly snackBar = inject(MatSnackBar);
+  private readonly data = inject(MAT_DIALOG_DATA);
   private readonly clienteService = inject(ClienteService);
+  private readonly inscripcionService = inject(InscripcionService);
+  private readonly dialog = inject(MatDialog);
   
   clienteId: string = '';
   cliente: Cliente | null = null;
@@ -56,11 +56,8 @@ export class SucursalesComponent implements OnInit {
   errorCliente: boolean = false;
   montosInversion: (number | string | null)[] = [];
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { clienteId: string }) {
-    this.clienteId = data?.clienteId || '';
-  }
-  
   ngOnInit(): void {
+    this.clienteId = this.data?.clienteId || '';
     this.cargarSucursales();
     this.cargarCliente();
   }
@@ -121,7 +118,7 @@ export class SucursalesComponent implements OnInit {
     this.cargandoProductos = true;
     this.errorProductos = false;
     this.productos = [];
-    this.montosInversion = []; // Resetear montos al cargar nuevos productos
+    this.montosInversion = [];
     
     this.http.get<Producto[]>(`http://localhost:8080/api/productos/sucursal/${sucursalId}`)
       .subscribe({
@@ -200,7 +197,7 @@ export class SucursalesComponent implements OnInit {
 
     console.log('Enviando inscripción:', inscripcionRequest);
 
-    this.http.post('http://localhost:8080/api/inscripcion', inscripcionRequest)
+    this.inscripcionService.crearInscripcion(inscripcionRequest)
       .subscribe({
         next: (response) => {
           console.log('Inscripción exitosa:', response);
@@ -214,24 +211,52 @@ export class SucursalesComponent implements OnInit {
                 next: () => {
                   console.log('Monto del cliente actualizado exitosamente');
                   
-                  // Actualizar el monto local del cliente
-                  if (this.cliente) {
-                    this.cliente.monto = nuevoMonto;
-                  }
-                  
-                  // Mostrar alerta de éxito
-                  this.dialog.open(AlertDialogComponent, {
-                    data: {
-                      title: 'Inscripción Exitosa',
-                      message: 'La inscripción se ha realizado correctamente y su saldo ha sido actualizado.',
-                      type: 'success'
-                    },
-                    width: '400px',
-                    disableClose: false
-                  });
-                  
-                  // Cerrar el modal y enviar el resultado
-                  this.dialogRef.close({ success: true, data: response });
+                  // Recargar los datos completos del cliente desde el backend
+                  this.clienteService.obtenerClientePorId(this.clienteId!)
+                    .subscribe({
+                      next: (clienteActualizado) => {
+                        this.cliente = clienteActualizado;
+                        this.cdr.detectChanges();
+                        
+                        // Mostrar alerta de éxito después de recargar los datos
+                        this.dialog.open(AlertDialogComponent, {
+                          data: {
+                            title: 'Inscripción Exitosa',
+                            message: 'La inscripción se ha realizado correctamente y su saldo ha sido actualizado.',
+                            type: 'success'
+                          },
+                          width: '400px',
+                          disableClose: false
+                        });
+                        
+                        // Cerrar el modal y enviar los datos actualizados del cliente
+                        this.dialogRef.close({ 
+                          success: true, 
+                          data: response, 
+                          clienteActualizado: clienteActualizado 
+                        });
+                      },
+                      error: (errorRecarga) => {
+                        console.error('Error al recargar datos del cliente:', errorRecarga);
+                        
+                        // Mostrar alerta de éxito pero con advertencia sobre la recarga
+                        this.dialog.open(AlertDialogComponent, {
+                          data: {
+                            title: 'Inscripción Exitosa',
+                            message: 'La inscripción se realizó correctamente y el saldo fue actualizado, pero hubo un problema al recargar los datos. Actualice la página para ver los cambios.',
+                            type: 'warning'
+                          },
+                          width: '400px',
+                          disableClose: false
+                        });
+                        
+                        this.dialogRef.close({ 
+                          success: true, 
+                          data: response,
+                          shouldRefreshClient: true
+                        });
+                      }
+                    });
                 },
                 error: (error) => {
                   console.error('Error al actualizar el monto del cliente:', error);
@@ -247,8 +272,12 @@ export class SucursalesComponent implements OnInit {
                     disableClose: false
                   });
                   
-                  // Cerrar el modal y enviar el resultado
-                  this.dialogRef.close({ success: true, data: response });
+                  // Cerrar el modal y indicar que se debe refrescar el cliente
+                  this.dialogRef.close({ 
+                    success: true, 
+                    data: response,
+                    shouldRefreshClient: true
+                  });
                 }
               });
           }

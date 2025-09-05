@@ -14,6 +14,10 @@ export class InscripcionService {
     return this.http.get<Inscripcion[]>(`${this.baseUrl}/cliente/${clienteId}`);
   }
 
+  crearInscripcion(inscripcion: any): Observable<any> {
+    return this.http.post<any>(this.baseUrl, inscripcion);
+  }
+
   eliminarInscripcion(inscripcionId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${inscripcionId}`);
   }
