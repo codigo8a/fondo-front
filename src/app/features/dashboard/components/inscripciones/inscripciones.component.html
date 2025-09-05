@@ -1,0 +1,73 @@
+<mat-card class="inscripciones-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>assignment</mat-icon>
+      Inscripciones
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (state.cargando) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando inscripciones...</p>
+      </div>
+    } @else if (state.error) {
+      <div class="error-container">
+        <mat-icon color="warn">error</mat-icon>
+        <p>Error al cargar las inscripciones</p>
+      </div>
+    } @else if (!state.esIdMongoValido) {
+      <div class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>ID de cliente no válido</p>
+      </div>
+    } @else if (state.inscripciones.length > 0) {
+      <div class="inscripciones-list">
+        @for (inscripcion of state.inscripciones; track inscripcion.id) {
+          <mat-card class="inscripcion-item">
+            <mat-card-header>
+              <mat-card-title class="producto-nombre">
+                {{ inscripcion.producto.nombre }}
+              </mat-card-title>
+              <mat-card-subtitle>
+                <mat-chip color="primary" selected>
+                  {{ inscripcion.producto.tipoProducto }}
+                </mat-chip>
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="inscripcion-details">
+                <div class="detail-row">
+                  <mat-icon>account_balance</mat-icon>
+                  <span><strong>Sucursal:</strong> {{ inscripcion.sucursal.nombre }}</span>
+                </div>
+                <div class="detail-row">
+                  <mat-icon>location_city</mat-icon>
+                  <span><strong>Ciudad:</strong> {{ inscripcion.sucursal.ciudad }}</span>
+                </div>
+                <div class="detail-row monto">
+                  <mat-icon>attach_money</mat-icon>
+                  <span><strong>Monto Invertido:</strong> 
+                    <span class="monto-value">{{ inscripcion.montoInvertido | currency:'COL':'symbol':'1.2-2' }}</span>
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <mat-icon>schedule</mat-icon>
+                  <span><strong>Fecha:</strong> {{ inscripcion.fechaTransaccion | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          @if (!$last) {
+            <mat-divider></mat-divider>
+          }
+        }
+      </div>
+    } @else {
+      <div class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>No hay inscripciones para este cliente</p>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>
