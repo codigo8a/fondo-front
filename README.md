@@ -1,59 +1,175 @@
-# FondoFront
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.1.
+## 🔧 Instalación y Configuración
 
-## Development server
+### Prerrequisitos
 
-To start a local development server, run:
+- Node.js 20.x
+- npm 10.x
+- Angular CLI 20.2.1
+
+### Instalación
+
+1. **Clonar el repositorio**:
+   ```bash
+   git clone <repository-url>
+   cd fondo-front
+   ```
+
+2. **Instalar dependencias**:
+   ```bash
+   npm install
+   ```
+
+3. **Configurar variables de entorno** (si es necesario):
+   ```bash
+   # Crear archivo .env para configuraciones locales
+   ```
+
+## 🚀 Comandos Disponibles
+
+### Desarrollo
 
 ```bash
+# Servidor de desarrollo
+npm start
+# o
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Navega a `http://localhost:4200/` para ver la aplicación.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Construcción
 
 ```bash
-ng generate component component-name
+# Build de producción
+npm run build
+
+# Build con SSR
+npm run build:ssr
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Testing
 
 ```bash
-ng generate --help
+# Ejecutar tests unitarios
+npm test
+
+# Tests en modo watch
+npm run watch
 ```
 
-## Building
-
-To build the project run:
+### Servidor SSR
 
 ```bash
-ng build
+# Ejecutar servidor SSR local
+npm run serve:ssr:fondo-front
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## 🌐 Despliegue en Heroku
 
-## Running unit tests
+### Configuración Automática
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+El proyecto está configurado para despliegue automático en Heroku:
 
-```bash
-ng test
+1. **Variables de entorno requeridas**:
+   ```bash
+   NODE_ENV=production
+   ```
+
+2. **Comandos de despliegue**:
+   ```bash
+   # Preparar para despliegue
+   npm run build
+   
+   # Commit y push
+   git add .
+   git commit -m "Deploy to production"
+   git push heroku main
+   ```
+
+### Archivos de Configuración
+
+- **Procfile**: Define el comando de inicio para Heroku
+- **server.js**: Servidor Express para producción
+- **package.json**: Scripts de build automático (`heroku-postbuild`)
+
+## 🏗️ Arquitectura
+
+### Principios SOLID Implementados
+
+- **SRP**: Cada componente tiene una responsabilidad específica
+- **OCP**: Extensible mediante interfaces
+- **LSP**: Implementaciones intercambiables
+- **ISP**: Interfaces segregadas por funcionalidad
+- **DIP**: Dependencias invertidas mediante inyección
+
+### Componentes Principales
+
+1. **DashboardComponent**: Componente principal que orquesta la aplicación
+2. **ClienteComponent**: Gestión de datos de clientes
+3. **InscripcionesComponent**: Manejo de inscripciones
+4. **LogComponent**: Visualización de logs del sistema
+5. **AlertDialogComponent**: Diálogos de confirmación
+
+### Servicios
+
+- **ClienteService**: API de clientes
+- **InscripcionService**: API de inscripciones
+- **ClienteStateService**: Estado global de clientes
+- **ClienteValidatorService**: Validaciones de negocio
+- **RandomSelectionService**: Selección aleatoria de datos
+
+## 🔍 Rutas de la Aplicación
+
+```typescript
+- '/' → Redirige a '/dashboard'
+- '/dashboard' → Componente principal
+- '/**' → Redirige a '/dashboard' (fallback)
 ```
 
-## Running end-to-end tests
+## 🎨 Estilos y Temas
 
-For end-to-end (e2e) testing, run:
+- **Angular Material**: Tema principal
+- **SCSS**: Preprocesador CSS
+- **Responsive Design**: Adaptable a diferentes dispositivos
+- **Prettier**: Formateo automático de código
 
-```bash
-ng e2e
+## 📝 Configuración de Prettier
+
+```json
+{
+  "printWidth": 100,
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "angular"
+      }
+    }
+  ]
+}
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 🤝 Contribución
 
-## Additional Resources
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 📄 Licencia
+
+Este proyecto es privado y está sujeto a las políticas de la organización.
+
+## 🆘 Soporte
+
+Para soporte técnico o preguntas sobre el proyecto, contacta al equipo de desarrollo.
+
+---
+
+**Versión**: 0.0.0  
+**Angular CLI**: 20.2.1  
+**Node**: 20.x  
+**Última actualización**: $(date)
