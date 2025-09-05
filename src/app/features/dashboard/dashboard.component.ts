@@ -31,12 +31,14 @@ import { LogComponent } from './components/log/log.component';
             <app-cliente 
               #clienteComponent
               [clienteId]="clienteIdAleatorio"
-              (inscripcionCreada)="onInscripcionCreada()">
+              (inscripcionCreada)="onInscripcionCreada()"
+              (logActualizado)="onLogActualizado()">
             </app-cliente>
           </div>
           
           <div class="left-row log-row">
             <app-log 
+              #logComponent
               [clienteId]="clienteIdAleatorio">
             </app-log>
           </div>
@@ -46,7 +48,8 @@ import { LogComponent } from './components/log/log.component';
           <app-inscripciones 
             #inscripcionesComponent
             [clienteId]="clienteIdAleatorio"
-            (clienteActualizado)="onClienteActualizado()">
+            (clienteActualizado)="onClienteActualizado()"
+            (logActualizado)="onLogActualizado()">
           </app-inscripciones>
         </div>
       </div>
@@ -155,6 +158,7 @@ import { LogComponent } from './components/log/log.component';
 export class DashboardComponent {
   @ViewChild('inscripcionesComponent') inscripcionesComponent!: InscripcionesComponent;
   @ViewChild('clienteComponent') clienteComponent!: ClienteComponent;
+  @ViewChild('logComponent') logComponent!: LogComponent;
   
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -221,6 +225,13 @@ export class DashboardComponent {
     // Recargar los datos del cliente cuando se actualiza el monto
     if (this.clienteComponent) {
       this.clienteComponent.cargarCliente();
+    }
+  }
+  
+  onLogActualizado(): void {
+    // Recargar los logs cuando se crea o elimina una inscripción
+    if (this.logComponent) {
+      this.logComponent.cargarLogs();
     }
   }
 }

@@ -45,6 +45,7 @@ class ClienteValidator {
 export class ClienteComponent implements OnInit, OnChanges {
   @Input() clienteId: string = '';
   @Output() inscripcionCreada = new EventEmitter<void>();
+  @Output() logActualizado = new EventEmitter<void>();
   
   private readonly clienteService = inject(ClienteService);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -170,8 +171,9 @@ export class ClienteComponent implements OnInit, OnChanges {
       console.log('Modal de sucursales cerrado:', result);
       
       if (result && result.success) {
-        // Si la inscripción fue exitosa, emitir evento para recargar inscripciones
+        // Si la inscripción fue exitosa, emitir AMBOS eventos
         this.inscripcionCreada.emit();
+        this.logActualizado.emit(); // ← Este evento debe emitirse SIEMPRE
         
         // Si se recibió el cliente actualizado, actualizar los datos locales
         if (result.clienteActualizado) {
