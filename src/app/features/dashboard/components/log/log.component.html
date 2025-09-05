@@ -1,0 +1,56 @@
+<mat-card class="log-container">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>history</mat-icon>
+      Historial de Operaciones
+    </mat-card-title>
+    <mat-card-subtitle>Últimas 4 operaciones realizadas</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (state.cargando) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando historial...</p>
+      </div>
+    } @else if (state.error) {
+      <div class="error-container">
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ state.error }}</p>
+        <button mat-button (click)="cargarLogs()" class="retry-button">
+          <mat-icon>refresh</mat-icon>
+          Reintentar
+        </button>
+      </div>
+    } @else if (state.logs.length === 0) {
+      <div class="empty-container">
+        <mat-icon>inbox</mat-icon>
+        <p>No hay operaciones registradas</p>
+      </div>
+    } @else {
+      <div class="logs-list">
+        @for (log of state.logs; track log.id) {
+          <div class="log-item">
+            <div class="log-icon">
+              <mat-icon [color]="obtenerColorOperacion(log.tipoOperacion)">
+                {{ obtenerIconoOperacion(log.tipoOperacion) }}
+              </mat-icon>
+            </div>
+            <div class="log-content">
+              <div class="log-header">
+                <span class="log-operation">{{ formatearTipoOperacion(log.tipoOperacion) }}</span>
+                <mat-chip class="log-entity" [color]="obtenerColorOperacion(log.tipoOperacion)">
+                  {{ log.tipoEntidad }}
+                </mat-chip>
+              </div>
+              <div class="log-details">
+                <p class="log-description">{{ log.detalles }}</p>
+                <span class="log-date">{{ formatearFecha(log.fechaMovimiento) }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </mat-card-content>
+</mat-card>
