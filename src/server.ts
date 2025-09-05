@@ -8,7 +8,7 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 // Serve static files from /browser
-app.get('*.*', express.static(browserDistFolder, {
+app.use(express.static(browserDistFolder, {
   maxAge: '1y'
 }));
 
