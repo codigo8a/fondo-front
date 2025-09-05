@@ -1,3 +1,43 @@
+# Fondo Front - Sistema de Gestión de Inversiones
+
+## 📋 Descripción
+
+**Fondo Front** es una aplicación web desarrollada con Angular 20 que permite gestionar clientes, sucursales, productos de inversión e inscripciones. La aplicación proporciona un flujo completo para la selección aleatoria de clientes, apertura de productos de inversión y seguimiento de transacciones mediante un sistema de logs.
+
+## 🚀 Funcionalidades Principales
+
+### 🎲 Gestión de Clientes
+- **Obtener Cliente Aleatorio**: Botón que carga aleatoriamente los datos de un cliente del sistema
+- **Visualización de datos**: Muestra información completa del cliente seleccionado
+- **Monto disponible**: Visualiza el saldo disponible para inversiones
+
+### 🏢 Gestión de Sucursales y Productos
+- **Modal de Sucursales**: Botón "Apertura" que abre un modal con todas las sucursales disponibles
+- **Selección de Sucursal**: Al seleccionar una sucursal, se cargan automáticamente los productos asociados
+- **Catálogo de Productos**: Visualización de productos de inversión disponibles por sucursal
+
+### 💰 Sistema de Inversiones
+- **Input Monto a Invertir**: Campo para ingresar el monto deseado de inversión
+- **Validaciones**:
+  - Monto mínimo requerido por producto
+  - Verificación de monto disponible del cliente
+  - Validación de inscripciones repetidas (evita duplicados)
+- **Botón Invertir**: Crea un nuevo registro en la tabla de inscripciones
+
+### 📊 Gestión de Inscripciones
+- **Creación de Inscripciones**: Registro automático al confirmar inversión
+- **Descuento Automático**: El monto invertido se descuenta del total disponible del cliente
+- **Cancelación de Inscripciones**: 
+  - Permite cancelar inscripciones existentes
+  - Devuelve automáticamente el monto al saldo disponible del cliente
+- **Prevención de Duplicados**: Validación que evita inscripciones repetidas del mismo cliente en el mismo producto
+
+### 📝 Sistema de Logs
+- **Registro de Actividades**: Genera logs automáticos para:
+  - Creación de inscripciones
+  - Cancelación de inscripciones
+- **Visualización**: Muestra los últimos 4 registros de actividad
+- **Trazabilidad**: Permite seguimiento completo de todas las transacciones
 
 ## 🔧 Instalación y Configuración
 
@@ -129,25 +169,3 @@ npm run serve:ssr:fondo-front
 }
 ```
 
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-Este proyecto es privado y está sujeto a las políticas de la organización.
-
-## 🆘 Soporte
-
-Para soporte técnico o preguntas sobre el proyecto, contacta al equipo de desarrollo.
-
----
-
-**Versión**: 0.0.0  
-**Angular CLI**: 20.2.1  
-**Node**: 20.x  
-**Última actualización**: $(date)
