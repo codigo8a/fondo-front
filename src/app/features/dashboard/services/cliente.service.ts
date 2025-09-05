@@ -8,7 +8,7 @@ import { Cliente } from '../interfaces/cliente.interface';
 })
 export class ClienteService {
   private readonly http = inject(HttpClient);
-  private readonly API_URL = 'http://localhost:8080/api/clientes';
+  private readonly API_URL = 'https://fondo-back-af12d1147ad0.herokuapp.com/api/clientes';
 
   obtenerClientes(): Observable<Cliente[]> {
     return this.http.get<Cliente[]>(this.API_URL);

@@ -7,7 +7,7 @@ import { Log } from '../interfaces/log.interfaces';
   providedIn: 'root'
 })
 export class LogService {
-  private readonly baseUrl = 'http://localhost:8080/api/logs';
+  private readonly baseUrl = 'https://fondo-back-af12d1147ad0.herokuapp.com/api/logs';
 
   constructor(private http: HttpClient) {}
 

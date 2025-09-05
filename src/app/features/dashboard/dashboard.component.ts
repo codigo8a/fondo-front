@@ -169,7 +169,7 @@ export class DashboardComponent {
 
   obtenerClienteAleatorio(): void {
     // NO usar valores temporales, simplemente hacer la petición
-    this.http.get<Cliente[]>('http://localhost:8080/api/clientes')
+    this.http.get<Cliente[]>('https://fondo-back-af12d1147ad0.herokuapp.com/api/clientes')
       .subscribe({
         next: (clientes) => {
           if (clientes && clientes.length > 0) {

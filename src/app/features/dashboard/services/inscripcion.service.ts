@@ -8,7 +8,7 @@ import { Inscripcion } from '../interfaces/inscripcion.interface';
 })
 export class InscripcionService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/inscripcion';
+  private readonly baseUrl = 'https://fondo-back-af12d1147ad0.herokuapp.com/api/inscripcion';
 
   obtenerInscripcionesPorCliente(clienteId: string): Observable<Inscripcion[]> {
     return this.http.get<Inscripcion[]>(`${this.baseUrl}/cliente/${clienteId}`);

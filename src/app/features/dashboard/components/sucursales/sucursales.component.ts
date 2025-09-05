@@ -93,7 +93,7 @@ export class SucursalesComponent implements OnInit {
     this.error = false;
     this.cdr.detectChanges();
     
-    this.http.get<Sucursal[]>('http://localhost:8080/api/sucursal')
+    this.http.get<Sucursal[]>('https://fondo-back-af12d1147ad0.herokuapp.com/api/sucursal')
       .subscribe({
         next: (sucursales) => {
           this.sucursales = sucursales;
@@ -120,7 +120,7 @@ export class SucursalesComponent implements OnInit {
     this.productos = [];
     this.montosInversion = [];
     
-    this.http.get<Producto[]>(`http://localhost:8080/api/productos/sucursal/${sucursalId}`)
+    this.http.get<Producto[]>(`https://fondo-back-af12d1147ad0.herokuapp.com/api/productos/sucursal/${sucursalId}`)
       .subscribe({
         next: (productos) => {
           this.productos = productos;
