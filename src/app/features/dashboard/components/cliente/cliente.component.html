@@ -1,0 +1,59 @@
+<mat-card class="cliente-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>person</mat-icon>
+      Cliente
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (state.cargando) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando datos del cliente...</p>
+      </div>
+    } @else if (state.error) {
+      <div class="error-container">
+        <mat-icon color="warn">error</mat-icon>
+        <p>Error al cargar los datos del cliente</p>
+      </div>
+    } @else if (!state.esIdMongoValido) {
+      <div class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>No hay datos del cliente</p>
+      </div>
+    } @else if (state.cliente) {
+      <div class="cliente-info">
+        <div class="info-row">
+          <mat-chip-set>
+            <mat-chip color="primary" selected>
+              <mat-icon matChipAvatar>badge</mat-icon>
+              ID: {{ state.cliente.id }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+        <div class="info-row">
+          <h3>{{ state.cliente.nombre }} {{ state.cliente.apellidos }}</h3>
+        </div>
+        <div class="info-row">
+          <mat-icon>location_city</mat-icon>
+          <span>{{ state.cliente.ciudad }}</span>
+        </div>
+        <div class="info-row monto">
+          <mat-icon>attach_money</mat-icon>
+          <span class="monto-value">{{ state.cliente.monto | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+    } @else {
+      <div class="no-data">
+        <mat-icon>info</mat-icon>
+        <p>No hay datos para mostrar</p>
+      </div>
+    }
+  </mat-card-content>
+  <mat-card-actions class="card-actions">
+    <button mat-raised-button color="accent" (click)="abrirModal()" class="modal-button">
+      <mat-icon>open_in_new</mat-icon>
+      Abrir Modal
+    </button>
+  </mat-card-actions>
+</mat-card>

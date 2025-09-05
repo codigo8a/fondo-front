@@ -4,6 +4,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ClienteService } from '../../services/cliente.service';
 import { Cliente } from '../../interfaces/cliente.interface';
 
@@ -24,6 +26,73 @@ class ClienteValidator {
   }
 }
 
+// Componente del modal de ejemplo
+@Component({
+  selector: 'app-modal-ejemplo',
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, MatDialogModule, MatIconModule],
+  template: `
+    <div class="modal-header">
+      <h2 mat-dialog-title>
+        <mat-icon>info</mat-icon>
+        Modal de Ejemplo
+      </h2>
+    </div>
+    <div mat-dialog-content class="modal-content">
+      <p>Este es un modal genérico de ejemplo.</p>
+      <p>Aquí puedes agregar cualquier contenido que necesites mostrar.</p>
+      <div class="ejemplo-info">
+        <mat-icon>lightbulb</mat-icon>
+        <span>Este modal se puede personalizar según tus necesidades.</span>
+      </div>
+    </div>
+    <div mat-dialog-actions class="modal-actions">
+      <button mat-button mat-dialog-close>Cerrar</button>
+      <button mat-raised-button color="primary" mat-dialog-close>Aceptar</button>
+    </div>
+  `,
+  styles: [`
+    .modal-header {
+      padding: 20px 24px 0;
+    }
+    
+    .modal-header h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      color: #1976d2;
+    }
+    
+    .modal-content {
+      padding: 20px 24px;
+      min-width: 300px;
+    }
+    
+    .ejemplo-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #f5f5f5;
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 16px;
+    }
+    
+    .ejemplo-info mat-icon {
+      color: #ff9800;
+    }
+    
+    .modal-actions {
+      padding: 8px 24px 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  `]
+})
+export class ModalEjemploComponent {}
+
 @Component({
   selector: 'app-cliente',
   standalone: true,
@@ -32,160 +101,12 @@ class ClienteValidator {
     MatCardModule, 
     MatProgressSpinnerModule, 
     MatIconModule,
-    MatChipsModule
+    MatChipsModule,
+    MatButtonModule,
+    MatDialogModule
   ],
-  template: `
-    <mat-card class="cliente-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>person</mat-icon>
-          Cliente
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        @if (state.cargando) {
-          <div class="loading-container">
-            <mat-spinner diameter="40"></mat-spinner>
-            <p>Cargando datos del cliente...</p>
-          </div>
-        } @else if (state.error) {
-          <div class="error-container">
-            <mat-icon color="warn">error</mat-icon>
-            <p>Error al cargar los datos del cliente</p>
-          </div>
-        } @else if (!state.esIdMongoValido) {
-          <div class="no-data">
-            <mat-icon>info</mat-icon>
-            <p>No hay datos del cliente</p>
-          </div>
-        } @else if (state.cliente) {
-          <div class="cliente-info">
-            <div class="info-row">
-              <mat-chip-set>
-                <mat-chip color="primary" selected>
-                  <mat-icon matChipAvatar>badge</mat-icon>
-                  ID: {{ state.cliente.id }}
-                </mat-chip>
-              </mat-chip-set>
-            </div>
-            <div class="info-row">
-              <h3>{{ state.cliente.nombre }} {{ state.cliente.apellidos }}</h3>
-            </div>
-            <div class="info-row">
-              <mat-icon>location_city</mat-icon>
-              <span>{{ state.cliente.ciudad }}</span>
-            </div>
-            <div class="info-row monto">
-              <mat-icon>attach_money</mat-icon>
-              <span class="monto-value">{{ state.cliente.monto | currency:'USD':'symbol':'1.2-2' }}</span>
-            </div>
-          </div>
-        } @else {
-          <div class="no-data">
-            <mat-icon>info</mat-icon>
-            <p>No hay datos para mostrar</p>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
-  `,
-  styles: [`
-    .cliente-card {
-      width: 100%;
-      min-height: 250px;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-    }
-    
-    mat-card-header {
-      background-color: #f5f5f5;
-      margin: -16px -16px 16px -16px;
-      padding: 16px;
-      width: calc(100% + 32px);
-      box-sizing: border-box;
-    }
-    
-    mat-card-content {
-      flex: 1;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    
-    mat-card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-    }
-    
-    .loading-container,
-    .error-container,
-    .no-data {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      text-align: center;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    
-    .cliente-info {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 100%;
-    }
-    
-    .info-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      flex-wrap: wrap;
-    }
-    
-    .info-row h3 {
-      margin: 0;
-      color: #1976d2;
-      font-weight: 500;
-      flex: 1;
-      min-width: 0;
-    }
-    
-    .info-row mat-icon {
-      color: #666;
-      flex-shrink: 0;
-    }
-    
-    .monto {
-      background-color: #e8f5e8;
-      padding: 8px;
-      border-radius: 4px;
-      border-left: 4px solid #4caf50;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    
-    .monto-value {
-      font-weight: bold;
-      color: #2e7d32;
-      font-size: 1.1rem;
-    }
-    
-    mat-chip-set {
-      margin: 0;
-      width: 100%;
-    }
-    
-    mat-chip {
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  `]
+  templateUrl: './cliente.component.html',
+  styleUrls: ['./cliente.component.scss']
 })
 export class ClienteComponent implements OnInit, OnChanges {
   @Input() clienteId: string = '';
@@ -193,6 +114,7 @@ export class ClienteComponent implements OnInit, OnChanges {
   // Inyección de dependencias (DIP)
   private readonly clienteService = inject(ClienteService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly dialog = inject(MatDialog);
   
   // Estado del componente
   state: ClienteComponentState = {
@@ -271,6 +193,19 @@ export class ClienteComponent implements OnInit, OnChanges {
         this.state.cargando = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  // Método para abrir el modal (SRP)
+  abrirModal(): void {
+    const dialogRef = this.dialog.open(ModalEjemploComponent, {
+      width: '400px',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Modal cerrado:', result);
     });
   }
 }
