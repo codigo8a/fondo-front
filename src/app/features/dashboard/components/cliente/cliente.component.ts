@@ -129,7 +129,6 @@ export class ClienteComponent implements OnInit, OnChanges {
   }
 
   // Método para cargar datos del cliente (SRP)
-  // Cambiar de private a public para que pueda ser llamado desde el dashboard
   public cargarCliente(): void {
     if (!this.clienteId) {
       this.resetearEstados();
@@ -175,10 +174,8 @@ export class ClienteComponent implements OnInit, OnChanges {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.success) {
-        // Si la inscripción fue exitosa, emitir AMBOS eventos
         this.inscripcionCreada.emit();
-        this.logActualizado.emit(); // ← Este evento debe emitirse SIEMPRE
-        
+        this.logActualizado.emit();       
         // Si se recibió el cliente actualizado, actualizar los datos locales
         if (result.clienteActualizado) {
           this.state.cliente = result.clienteActualizado;

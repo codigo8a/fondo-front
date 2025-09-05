@@ -195,15 +195,6 @@ export class SucursalesComponent implements OnInit {
       fechaTransaccion: new Date().toISOString()
     };
 
-    // En el método donde está la línea 198, eliminar:
-    // console.log('Enviando inscripción:', inscripcionRequest);
-    
-    // En el método donde está la línea 203, eliminar:
-    // console.log('Inscripción exitosa:', response);
-    
-    // En el método donde está la línea 212, eliminar:
-    // console.log('Monto del cliente actualizado exitosamente');
-    
     this.inscripcionService.crearInscripcion(inscripcionRequest)
       .subscribe({
         next: (response) => {
